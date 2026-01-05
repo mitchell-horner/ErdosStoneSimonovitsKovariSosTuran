@@ -4,10 +4,11 @@ open Fintype Function
 
 namespace SimpleGraph
 
-noncomputable def completeBipartiteGraph.overFin (α β : Type*) [Fintype α] [Fintype β] :
-    completeBipartiteGraph α β ≃g completeBipartiteGraph (Fin (card α)) (Fin (card β)) where
-  toFun := Sum.map (equivFin α) (equivFin β)
-  invFun := Sum.map (equivFin α).symm (equivFin β).symm
+noncomputable def completeBipartiteGraph.overFinIso {α β : Type*} [Fintype α] [Fintype β]
+    {s t : ℕ} (hc₁ : card α = s) (hc₂ : card β = t) :
+    completeBipartiteGraph α β ≃g completeBipartiteGraph (Fin s) (Fin t) where
+  toFun := Sum.map (equivFinOfCardEq hc₁) (equivFinOfCardEq hc₂)
+  invFun := Sum.map (equivFinOfCardEq hc₁).symm (equivFinOfCardEq hc₂).symm
   left_inv _ := by simp
   right_inv _ := by simp
   map_rel_iff' := by simp

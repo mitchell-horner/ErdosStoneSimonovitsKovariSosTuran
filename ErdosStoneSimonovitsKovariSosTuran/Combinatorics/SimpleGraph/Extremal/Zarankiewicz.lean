@@ -25,21 +25,15 @@ theorem zarankiewicz_of_fintypeCard_eq
     zarankiewicz m n s t =
       sup { G : SimpleGraph (V ⊕ W) | G ≤ completeBipartiteGraph V W
         ∧ (completeBipartiteGraph α β).Free G} (#·.edgeFinset) := by
-  let e₁ : completeBipartiteGraph V W ≃g completeBipartiteGraph (Fin m) (Fin n) :=
-    ⟨⟨.map (Fintype.equivFinOfCardEq hm) (Fintype.equivFinOfCardEq hn),
-      .map (Fintype.equivFinOfCardEq hm).symm (Fintype.equivFinOfCardEq hn).symm,
-      fun _ ↦ by simp, fun _ ↦ by simp⟩, by simp⟩
+  let e₁ := completeBipartiteGraph.overFinIso hm hn
   let K := completeBipartiteGraph (Fin s) (Fin t)
-  let e₂ : completeBipartiteGraph α β ≃g K :=
-    ⟨⟨.map (Fintype.equivFinOfCardEq hs) (Fintype.equivFinOfCardEq ht),
-      .map (Fintype.equivFinOfCardEq hs).symm (Fintype.equivFinOfCardEq ht).symm,
-      fun _ ↦ by simp, fun _ ↦ by simp⟩, by simp [K]⟩
+  let e₂ := completeBipartiteGraph.overFinIso hs ht
   rw [zarankiewicz, le_antisymm_iff]
   and_intros
   on_goal 1 =>
-    let e₁ : completeBipartiteGraph (Fin m) (Fin n) ≃g completeBipartiteGraph V W := e₁.symm
+    let e₁ := e₁.symm
     let K := completeBipartiteGraph α β
-    let e₂ : completeBipartiteGraph (Fin s) (Fin t) ≃g K := e₂.symm
+    let e₂ := e₂.symm
   all_goals
     simp_rw [Finset.sup_le_iff, mem_filter, mem_univ, true_and]
     intro G ⟨h_le, h_free⟩
@@ -104,7 +98,7 @@ theorem zarankiewicz_le_extremalNumber :
   intro B ⟨_, h⟩
   rw [(Iso.map finSumFinEquiv B).card_edgeFinset_eq]
   exact card_edgeFinset_le_extremalNumber <|
-    (h.congr_left <| completeBipartiteGraph.overFin α β).congr_right
+    (h.congr_left <| completeBipartiteGraph.overFinIso rfl rfl).congr_right
       (Iso.map finSumFinEquiv B).symm
 
 /-- The symmetric Zarankiewicz function is at least twice a corresponding extremal number. -/
@@ -114,7 +108,7 @@ theorem two_mul_extremalNumber_le_zarankiewicz_symm [Nonempty α] [Nonempty β] 
     enter [1, 2, 1]
     rw [← Fintype.card_fin n]
   rify
-  rw [ ← le_div_iff₀' (by positivity), extremalNumber_le_iff_of_nonneg _ (by positivity)]
+  rw [← le_div_iff₀' (by positivity), extremalNumber_le_iff_of_nonneg _ (by positivity)]
   intro G _ h
   rw [le_div_iff₀' (by positivity), ← Nat.cast_two, ← Nat.cast_mul, Nat.cast_le]
   apply Finset.le_sup_of_le (b := G.bipartiteDoubleCover)
@@ -123,7 +117,7 @@ theorem two_mul_extremalNumber_le_zarankiewicz_symm [Nonempty α] [Nonempty β] 
     contrapose! h
     rw [not_free] at h ⊢
     exact bipartiteDoubleCover_completeBipartiteGraph_isContained <|
-      h.trans' ⟨(completeBipartiteGraph.overFin α β).toCopy⟩
+      h.trans' ⟨(completeBipartiteGraph.overFinIso rfl rfl).toCopy⟩
   · convert bipartiteDoubleCover_card_edgeFinset.symm.le
 
 end SimpleGraph
