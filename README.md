@@ -1,6 +1,6 @@
 # Formalising the Erdős-Stone-Simonovits theorem and the Kővári–Sós–Turán theorem in Lean
 
-[![Lean Action CI](https://github.com/mitchell-horner/ErdosStoneSimonovits/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/mitchell-horner/ErdosStoneSimonovits/actions/workflows/lean_action_ci.yml)
+[![Lean Action CI](https://github.com/mitchell-horner/ErdosStoneSimonovitsKovariSosTuran/actions/workflows/lean_action_ci.yml/badge.svg)](https://github.com/mitchell-horner/ErdosStoneSimonovitsKovariSosTuran/actions/workflows/lean_action_ci.yml)
 
 This repository contains a formalisation of the Erdős-Stone-Simonovits theorem and the Kővári–Sós–Turán theorem in [Lean](https://lean-lang.org/). The statements of the results are as follows:
 
@@ -106,17 +106,41 @@ theorem isContained_of_card_edgeFinset_of_chromaticNumber
     #G.edgeFinset ≥ (1 - 1 / r + ε) * n.choose 2 → H ⊑ G
 ```
 
-**The Kővári–Sós–Turán theorem**
+**The Kővári-Sós-Turán theorem**
 
-Suppose $s$ and $t$ are natural numbers such that $1 \leq s \leq t$. The extremal numbers of complete bipartite graphs satisfy 
+Suppose $m$, $n$, $s$ and $t$ are natural numbers such that $1 \leq s \leq t$. The Zarankiewicz function $z(m, n; s, t)$ satisfies 
 
-$$\textrm{ex}(n, K_{s, t}) \leq \frac{1}{2}(t-1)^{1/s}n^{2-1/s}+\frac{1}{2}n(s-1).$$
+$$\textrm{z}(m, n; s, t) \leq (t-1)^{1/s} m n^{1-1/s}+(s-1)n.$$
+
+```lean
+theorem zarankiewicz_le (m n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
+  (zarankiewicz m n s t : ℝ)
+    ≤ ((t - 1) ^ (s⁻¹ : ℝ) * m * n ^ (1 - (s⁻¹ : ℝ)) + (s - 1) * n : ℝ)
+```
+
+**The Kővári-Sós-Turán theorem (symmetric version)**
+
+Suppose $n$, $s$ and $t$ are natural numbers such that $1 \leq s \leq t$. The Zarankiewicz function $z(n, n; s, t)$ satisfies 
+
+$$\textrm{z}(n, n; s, t) \leq (t-1)^{1/s} n^{2-1/s}+(s-1)n.$$
+
+```lean
+theorem symm_zarankiewicz_le (n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
+  (zarankiewicz n n s t : ℝ) 
+    ≤ ((t - 1) ^ (s : ℝ)⁻¹ * n ^ (2 - (s : ℝ)⁻¹) + (s - 1) * n : ℝ)
+```
+
+**The Kővári-Sós-Turán theorem (extremal number version)**
+
+Suppose $n$, $s$ and $t$ are natural numbers such that $1 \leq s \leq t$. The extremal numbers of complete bipartite graphs satisfy
+
+$$\textrm{ex}(n, K_{s, t}) \leq \frac{1}{2}(t-1)^{1/s} n^{2-1/s}+\frac{1}{2}(s-1)n.$$
 
 ```lean
 theorem extremalNumber_completeBipartiteGraph_le
   (n : ℕ) [Nonempty α] (hcard_le : card α ≤ card β) :
-  extremalNumber n (completeBipartiteGraph α β) ≤
-    ((card β - 1) ^ (1 / card α : ℝ) * n ^ (2 - 1 / card α : ℝ) / 2 + n * (card α - 1) / 2 : ℝ)
+  (extremalNumber n (completeBipartiteGraph α β) : ℝ) 
+    ≤ (card β - 1) ^ (card α : ℝ)⁻¹ * n ^ (2 - (card α : ℝ)⁻¹) / 2 + (card α - 1) * n / 2
 ```
 
 ## Upstreaming to mathlib
@@ -132,10 +156,12 @@ The progress towards upstreaming these results to [mathlib](https://github.com/l
 - [ ] The Erdős-Stone-Simonovits theorem (equivalence version)
 - [ ] The Erdős-Stone(-Simonovits) theorem (chromatic number subgraph version)
 - [ ] The Kővári–Sós–Turán theorem
+- [ ] The Kővári–Sós–Turán theorem (symmetric version)
+- [ ] The Kővári–Sós–Turán theorem (extremal number version)
 
 ## Future work
 
-Future work formalising the forbidden subgraph problem from extremal graph theory could include:
+Future work formalising the forbidden subgraph problem could include:
 
 - The supersaturation theorem ([mitchell-horner/Supersaturation](https://github.com/mitchell-horner/Supersaturation))
 
