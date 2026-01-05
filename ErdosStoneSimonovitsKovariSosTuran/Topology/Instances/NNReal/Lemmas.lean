@@ -1,6 +1,6 @@
 import Mathlib
-import ErdosStoneSimonovits.Algebra.Order.Monoid.Canonical.Basic
-import ErdosStoneSimonovits.Order.Monotone.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Algebra.Order.Monoid.Canonical.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Order.Monotone.Basic
 
 open Filter Set Topology
 

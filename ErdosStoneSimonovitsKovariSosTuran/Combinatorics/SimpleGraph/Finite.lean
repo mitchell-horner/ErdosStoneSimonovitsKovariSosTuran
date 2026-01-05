@@ -1,7 +1,7 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Basic
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Maps
-import ErdosStoneSimonovits.Data.Sym.Sym2
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Maps
+import ErdosStoneSimonovitsKovariSosTuran.Data.Sym.Sym2
 
 open Finset Function
 

@@ -1,8 +1,8 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.DeleteEdges
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.Basic
-import ErdosStoneSimonovits.Order.Monotone.Basic
-import ErdosStoneSimonovits.Topology.Instances.NNReal.Lemmas
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.DeleteEdges
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Order.Monotone.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Topology.Instances.NNReal.Lemmas
 
 open Asymptotics Filter Finset Fintype Topology
 

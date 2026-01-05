@@ -1,7 +1,7 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Basic
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Copy
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.DegreeSum
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Copy
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.DegreeSum
 
 open BigOperators Finset Fintype
 

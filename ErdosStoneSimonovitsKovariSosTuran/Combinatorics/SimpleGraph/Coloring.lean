@@ -1,5 +1,5 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Basic
 
 open Fintype Function
 

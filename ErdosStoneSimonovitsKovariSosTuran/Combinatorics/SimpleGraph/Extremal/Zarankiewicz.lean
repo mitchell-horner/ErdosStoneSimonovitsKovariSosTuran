@@ -1,7 +1,7 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Bipartite
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.Basic
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Maps
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Bipartite
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Maps
 
 open Finset Fintype
 

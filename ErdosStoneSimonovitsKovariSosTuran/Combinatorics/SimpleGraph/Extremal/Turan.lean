@@ -1,7 +1,7 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Clique
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.Basic
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Finite
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Clique
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Finite
 
 namespace SimpleGraph
 

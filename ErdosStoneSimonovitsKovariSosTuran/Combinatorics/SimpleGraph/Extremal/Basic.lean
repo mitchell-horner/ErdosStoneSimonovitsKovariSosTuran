@@ -1,6 +1,6 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Copy
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.DeleteEdges
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Copy
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.DeleteEdges
 
 open Finset Fintype
 

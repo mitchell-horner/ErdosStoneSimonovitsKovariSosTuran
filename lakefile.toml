@@ -1,7 +1,7 @@
-name = "ErdosStoneSimonovits"
+name = "ErdosStoneSimonovitsKovariSosTuran"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["ErdosStoneSimonovits"]
+defaultTargets = ["ErdosStoneSimonovitsKovariSosTuran"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -12,5 +12,5 @@ name = "mathlib"
 scope = "leanprover-community"
 
 [[lean_lib]]
-name = "ErdosStoneSimonovits"
-globs = ["ErdosStoneSimonovits.+"]
+name = "ErdosStoneSimonovitsKovariSosTuran"
+globs = ["ErdosStoneSimonovitsKovariSosTuran.+"]

@@ -1,10 +1,10 @@
 import Mathlib
-import ErdosStoneSimonovits.Analysis.SpecialFunctions.Choose
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Bipartite
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Equipartite
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.TuranDensity
-import ErdosStoneSimonovits.Data.Finset.Union
-import ErdosStoneSimonovits.Data.Nat.Cast.Order.Field
+import ErdosStoneSimonovitsKovariSosTuran.Analysis.SpecialFunctions.Choose
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Bipartite
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Equipartite
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.TuranDensity
+import ErdosStoneSimonovitsKovariSosTuran.Data.Finset.Union
+import ErdosStoneSimonovitsKovariSosTuran.Data.Nat.Cast.Order.Field
 
 open Asymptotics Filter Finset Fintype Real Topology
 

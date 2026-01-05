@@ -1,8 +1,8 @@
 import Mathlib
-import ErdosStoneSimonovits.Analysis.SpecialFunctions.Pochhammer
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Bipartite
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.Basic
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.Zarankiewicz
+import ErdosStoneSimonovitsKovariSosTuran.Analysis.SpecialFunctions.Pochhammer
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Bipartite
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Zarankiewicz
 
 open Finset Fintype
 

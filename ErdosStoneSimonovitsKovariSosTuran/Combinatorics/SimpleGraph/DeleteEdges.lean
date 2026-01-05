@@ -1,5 +1,5 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Finite
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Finite
 
 open Finset Fintype
 

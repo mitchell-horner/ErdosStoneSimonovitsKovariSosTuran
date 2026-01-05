@@ -1,5 +1,5 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Copy
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Copy
 
 open Finset Fintype Function
 

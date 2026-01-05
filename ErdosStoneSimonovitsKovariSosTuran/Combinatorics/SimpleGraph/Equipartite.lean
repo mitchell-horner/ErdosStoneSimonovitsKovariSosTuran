@@ -1,7 +1,7 @@
 import Mathlib
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Basic
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Coloring
-import ErdosStoneSimonovits.Combinatorics.SimpleGraph.Extremal.Turan
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Basic
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Coloring
+import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Turan
 
 open Fintype Finset Function
 

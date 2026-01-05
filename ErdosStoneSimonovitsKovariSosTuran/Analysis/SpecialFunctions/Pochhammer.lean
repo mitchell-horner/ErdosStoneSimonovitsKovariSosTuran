@@ -1,7 +1,7 @@
 import Mathlib
-import ErdosStoneSimonovits.Analysis.Convex.Piecewise
-import ErdosStoneSimonovits.Data.Nat.Choose.Cast
-import ErdosStoneSimonovits.RingTheory.Polynomial.Pochhammer
+import ErdosStoneSimonovitsKovariSosTuran.Analysis.Convex.Piecewise
+import ErdosStoneSimonovitsKovariSosTuran.Data.Nat.Choose.Cast
+import ErdosStoneSimonovitsKovariSosTuran.RingTheory.Polynomial.Pochhammer
 
 section DescPochhammer
 
