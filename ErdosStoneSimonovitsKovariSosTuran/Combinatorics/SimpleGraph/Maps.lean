@@ -4,6 +4,8 @@ open Fintype Function
 
 namespace SimpleGraph
 
+/-- The isomorphism between `completeBipartiteGraph α β` and
+`completeBipartiteGraph (Fin s) (Fin t)` where `card α = s` and `card β = t`. -/
 noncomputable def completeBipartiteGraph.overFinIso {α β : Type*} [Fintype α] [Fintype β]
     {s t : ℕ} (hc₁ : card α = s) (hc₂ : card β = t) :
     completeBipartiteGraph α β ≃g completeBipartiteGraph (Fin s) (Fin t) where
