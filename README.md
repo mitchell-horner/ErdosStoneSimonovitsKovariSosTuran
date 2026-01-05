@@ -118,18 +118,6 @@ theorem zarankiewicz_le (m n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
     ≤ ((t - 1) ^ (s⁻¹ : ℝ) * m * n ^ (1 - (s⁻¹ : ℝ)) + (s - 1) * n : ℝ)
 ```
 
-**The Kővári-Sós-Turán theorem (symmetric version)**
-
-Suppose $n$, $s$ and $t$ are natural numbers such that $1 \leq s \leq t$. The Zarankiewicz function $z(n, n; s, t)$ satisfies 
-
-$$\textrm{z}(n, n; s, t) \leq (t-1)^{1/s} n^{2-1/s}+(s-1)n.$$
-
-```lean
-theorem symm_zarankiewicz_le (n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
-  (zarankiewicz n n s t : ℝ) 
-    ≤ ((t - 1) ^ (s : ℝ)⁻¹ * n ^ (2 - (s : ℝ)⁻¹) + (s - 1) * n : ℝ)
-```
-
 **The Kővári-Sós-Turán theorem (extremal number version)**
 
 Suppose $n$, $s$ and $t$ are natural numbers such that $1 \leq s \leq t$. The extremal numbers of complete bipartite graphs satisfy
@@ -156,7 +144,6 @@ The progress towards upstreaming these results to [mathlib](https://github.com/l
 - [ ] The Erdős-Stone-Simonovits theorem (equivalence version)
 - [ ] The Erdős-Stone(-Simonovits) theorem (chromatic number subgraph version)
 - [ ] The Kővári–Sós–Turán theorem
-- [ ] The Kővári–Sós–Turán theorem (symmetric version)
 - [ ] The Kővári–Sós–Turán theorem (extremal number version)
 
 ## Future work
