@@ -30,7 +30,7 @@ theorem bound_nonneg (m n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : 1 ≤ t) : 0 �
 `n`-sized subset of the neighbor finset of `w : W` in `G : SimpleGraph V ⊕ W`.
 
 This is an auxiliary definition for the **Kővári-Sós-Turán theorem**. -/
-private abbrev filter [DecidableEq V] [DecidableEq W]
+abbrev filter [DecidableEq V] [DecidableEq W]
   (G : SimpleGraph (V ⊕ W)) [DecidableRel G.Adj] (n : ℕ) :=
   ((univ.map .inl).powersetCard n ×ˢ (univ.map .inr)).filter fun (t, w) ↦ t ⊆ G.neighborFinset w
 
@@ -41,7 +41,7 @@ open Classical in
 number of ways to choose `card α` vertices from `card V` vertices `card β - 1` times.
 
 This is an auxiliary lemma for the **Kővári-Sós-Turán theorem**. -/
-lemma card_filterBipartite_le [Nonempty β] (h : (completeBipartiteGraph α β).Free G) :
+lemma card_filter_le [Nonempty β] (h : (completeBipartiteGraph α β).Free G) :
     #(filter G (card α)) ≤ ((card V).choose (card α) * (card β - 1) : ℝ) := by
   have hcard_univ_map_inl : #(univ.map .inl : Finset (V ⊕ W)) = card V := by
     rw [card_map, card_univ]
@@ -67,7 +67,7 @@ that `#KovariSosTuran.filter` is at least `card α` times the desending pochhamm
 evaluated at the average divided by `(card α).factorial`.
 
 This is an auxiliary lemma for the **Kővári-Sós-Turán theorem**. -/
-lemma le_card_filterBipartite [Nonempty W] [Nonempty α]
+lemma le_card_filter [Nonempty W] [Nonempty α]
     (h_le : G ≤ completeBipartiteGraph V W)
     (h_avg : card α - 1 ≤ (∑ w : W, G.degree (.inr w) : ℝ) / card W) :
     (card W * ((descPochhammer ℝ (card α)).eval
@@ -161,13 +161,13 @@ lemma card_edgeFinset_le_bound_of_completeBipartiteGraph_free [Nonempty α] [Non
       -- counting `t`
       · trans (card W) * ((descPochhammer ℝ (card α)).eval
           ((∑ w : W, G.degree (.inr w) : ℝ) / card W) / (card α).factorial)
-        · rw [← h_sum_degrees_eq_card_edges, Nat.cast_sum,
-            mul_div, div_le_div_iff_of_pos_right (by positivity), mul_le_mul_left (by positivity)]
+        · rw [← h_sum_degrees_eq_card_edges, Nat.cast_sum, mul_div,
+            div_le_div_iff_of_pos_right (by positivity), mul_le_mul_left (by positivity)]
           exact pow_le_descPochhammer_eval h_avg
-        · exact le_card_filterBipartite h_le h_avg
+        · exact le_card_filter h_le h_avg
       -- counting `v`
       · trans (card V).choose (card α) * (card β - 1)
-        · exact card_filterBipartite_le h_free
+        · exact card_filter_le h_free
         · exact mul_le_mul_of_nonneg_right (mod_cast Nat.choose_le_pow_div (card α) (card V)) <|
             sub_nonneg_of_le (mod_cast Nat.succ_le_of_lt card_pos)
 
