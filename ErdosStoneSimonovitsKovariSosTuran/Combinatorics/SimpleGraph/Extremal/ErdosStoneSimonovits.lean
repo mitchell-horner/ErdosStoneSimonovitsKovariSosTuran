@@ -19,15 +19,15 @@ namespace ErdosStone
 
 variable {ε : ℝ} {r t t' : ℕ} (K : G.CompleteEquipartiteSubgraph r t')
 
-/-- `filterComplVertsAdjParts` is the set of vertices in the complement of a complete equipartite
+/-- `ErdosStone.filter` is the set of vertices in the complement of a complete equipartite
 subgraph, in `r` parts each of size `t'`, adjacent to at least `t` vertices in each part of the
 complete equipartite subgraph.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
-abbrev filterComplVertsAdjParts (t : ℕ) : Finset (Fin n) :=
-  { v ∈ K.vertsᶜ | ∀ i : Fin r, ∃ s ∈ (K.parts i).powersetCard t, ∀ w ∈ s, G.Adj v w }
+abbrev filter (t : ℕ) : Finset (Fin n) :=
+  { v ∈ K.vertsᶜ | ∀ p ∈ K.parts, ∃ s ∈ p.powersetCard t, ∀ w ∈ s, G.Adj v w }
 
-theorem filterComplVertsAdjParts_subset_compl_verts : filterComplVertsAdjParts K t ⊆ K.vertsᶜ :=
+theorem filter_subset_compl_verts : filter K t ⊆ K.vertsᶜ :=
   filter_subset _ K.vertsᶜ
 
 omit [DecidableRel G.Adj] in
@@ -43,30 +43,32 @@ lemma le_card_edgeFinset_between_verts :
   exact sum_le_sum (fun v hv ↦ sub_le_iff_le_add.mpr <|
     mod_cast (G.minDegree_le_degree v).trans (degree_le_between_add hv))
 
-/-- For `v ∈ K.vertsᶜ \ filterComplVertsAdjParts`, since `v` is adjacent to fewer than `t`
+/-- For `v ∈ K.vertsᶜ \ ErdosStone.filter`, since `v` is adjacent to fewer than `t`
 vertices in at least one part of the complete equipartite subgraph, it follows that `v` is
 adjacent to fewer than `#K.verts - (t' - t)` vertices in `K.verts`.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
 lemma degree_between_verts_lt_of_mem_sdiff
-    {v : Fin n} (hv : v ∈ K.vertsᶜ \ filterComplVertsAdjParts K t) :
+    {v : Fin n} (hv : v ∈ K.vertsᶜ \ filter K t) (ht'_pos : 0 < t') :
     (G.between K.verts K.vertsᶜ).degree v < #K.verts - t' + t := by
   simp_rw [mem_sdiff, mem_filter, not_and_or, and_or_left, and_not_self_iff, false_or,
     not_forall, not_exists, not_and_or, not_forall, exists_prop] at hv
-  obtain ⟨hv, i, hs⟩ := hv
+  obtain ⟨hv, p, hp, hs⟩ := hv
   rw [← card_neighborFinset_eq_degree,
-    isBipartiteWith_neighborFinset' (between_verts_isBipartiteWith K) hv,
-    filter_disjiUnion, card_disjiUnion, sum_eq_sum_diff_singleton_add (mem_univ i)]
+    isBipartiteWith_neighborFinset' (between_verts_isBipartiteWith K) hv]
+  conv =>
+    enter [1, 1, 2]
+    unfold CompleteEquipartiteSubgraph.verts
+  rw [filter_disjiUnion, card_disjiUnion, sum_eq_sum_diff_singleton_add hp]
   apply add_lt_add_of_le_of_lt
   · conv_rhs =>
-      rw [K.card_verts, ← Nat.sub_one_mul, ← Fintype.card_fin r,
-        ← card_singleton i, ← card_compl, ← smul_eq_mul, ← sum_const]
-      enter [2, j]
-      rw [← K.card_parts j]
+      rw [K.card_verts, ← Nat.sub_one_mul, ← K.card_parts.resolve_right ht'_pos.ne',
+        ← card_singleton p, ← card_sdiff (singleton_subset_iff.mpr hp), ← smul_eq_mul,
+        ← sum_const, ← Finset.sum_congr rfl fun _ h ↦ K.card_mem_parts (mem_sdiff.mp h).1]
     exact sum_le_sum (fun _ _ ↦ card_filter_le _ _)
   · contrapose! hs
     obtain ⟨s, hs⟩ := powersetCard_nonempty.mpr hs
-    have hs' : s ∈ (K.parts i).powersetCard t := powersetCard_mono (filter_subset _ _) hs
+    have hs' : s ∈ p.powersetCard t := powersetCard_mono (filter_subset _ _) hs
     refine ⟨s, hs', fun w hw ↦ ?_⟩
     obtain ⟨_, hadj, _⟩ := by
       rw [mem_powersetCard] at hs
@@ -74,38 +76,38 @@ lemma degree_between_verts_lt_of_mem_sdiff
       rwa [mem_filter, between_adj] at hw
     exact hadj.symm
 
-lemma card_edgeFinset_between_verts_le (hr_pos : 0 < r) :
+lemma card_edgeFinset_between_verts_le (hr_pos : 0 < r) (ht'_pos : 0 < t') :
     (#(G.between K.verts K.vertsᶜ).edgeFinset : ℝ)
       ≤ (n - #K.verts) * (#K.verts - (t' - t))
-        + #(filterComplVertsAdjParts K t) * (t' - t) :=
+        + #(filter K t) * (t' - t) :=
   calc (#(G.between K.verts K.vertsᶜ).edgeFinset : ℝ)
-    _ = ∑ v ∈ K.vertsᶜ \ filterComplVertsAdjParts K t, ((G.between K.verts K.vertsᶜ).degree v : ℝ)
-      + ∑ v ∈ filterComplVertsAdjParts K t, ((G.between K.verts K.vertsᶜ).degree v : ℝ) := by
+    _ = ∑ v ∈ K.vertsᶜ \ filter K t, ((G.between K.verts K.vertsᶜ).degree v : ℝ)
+      + ∑ v ∈ filter K t, ((G.between K.verts K.vertsᶜ).degree v : ℝ) := by
         rw [sum_sdiff (filter_subset _ K.vertsᶜ), eq_comm]
         exact_mod_cast isBipartiteWith_sum_degrees_eq_card_edges'
           (between_verts_isBipartiteWith K)
-    _ ≤ ∑ _ ∈ K.vertsᶜ \ filterComplVertsAdjParts K t, (#K.verts - t' + t : ℝ)
-      + ∑ _ ∈ filterComplVertsAdjParts K t, (#K.verts : ℝ) := by
+    _ ≤ ∑ _ ∈ K.vertsᶜ \ filter K t, (#K.verts - t' + t : ℝ)
+      + ∑ _ ∈ filter K t, (#K.verts : ℝ) := by
         apply add_le_add <;> refine sum_le_sum (fun v hv ↦ ?_)
         · rw [← Nat.cast_sub ((Nat.le_mul_of_pos_left t' hr_pos).trans_eq K.card_verts.symm)]
-          exact_mod_cast (degree_between_verts_lt_of_mem_sdiff K hv).le
+          exact_mod_cast (degree_between_verts_lt_of_mem_sdiff K hv ht'_pos).le
         · exact_mod_cast isBipartiteWith_degree_le'
-            (between_verts_isBipartiteWith K) (filterComplVertsAdjParts_subset_compl_verts K hv)
+            (between_verts_isBipartiteWith K) (filter_subset_compl_verts K hv)
     _ = (n - #K.verts) * (#K.verts - (t' - t))
-      + #(filterComplVertsAdjParts K t) * (t' - t) := by
-        rw [sum_const, nsmul_eq_mul, card_sdiff (filterComplVertsAdjParts_subset_compl_verts K),
-          Nat.cast_sub (card_le_card (filterComplVertsAdjParts_subset_compl_verts K)), card_compl,
+      + #(filter K t) * (t' - t) := by
+        rw [sum_const, nsmul_eq_mul, card_sdiff (filter_subset_compl_verts K),
+          Nat.cast_sub (card_le_card (filter_subset_compl_verts K)), card_compl,
           Nat.cast_sub (card_le_univ K.verts), Fintype.card_fin, sum_const, nsmul_eq_mul, sub_mul,
-          sub_add (#K.verts : ℝ) _ _, mul_sub (#(filterComplVertsAdjParts K t) : ℝ) _ _,
+          sub_add (#K.verts : ℝ) _ _, mul_sub (#(filter K t) : ℝ) _ _,
           ← sub_add, sub_add_eq_add_sub, sub_add_cancel]
 
-/-- `#filterComplVertsAdjParts` is arbitrarily large with respect to `n`.
+/-- `#ErdosStone.filter` is arbitrarily large with respect to `n`.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
-theorem mul_le_card_filterComplVertsAdjParts_mul
-    (hr_pos : 0 < r) (hδ : G.minDegree ≥ (1 - 1 / r + ε) * n)
+theorem mul_le_card_filter_mul (hr_pos : 0 < r) (ht'_pos : 0 < t')
+    (hδ : G.minDegree ≥ (1 - 1 / r + ε) * n)
     {N : ℕ} (hN : (N + r * t') * (t' - t) ≤ n * (r * t' * ε - t)) :
-    (N * (t' - t) : ℝ) ≤ (#(filterComplVertsAdjParts K t) * (t' - t) : ℝ) :=
+    (N * (t' - t) : ℝ) ≤ (#(filter K t) * (t' - t) : ℝ) :=
   calc (N * (t' - t) : ℝ)
     _ ≤ n * (r * t' * ε - t) - r * t' * (t' - t) := by
         rw [← add_sub_cancel_right (N : ℝ) (r * t' : ℝ), sub_mul]
@@ -120,43 +122,44 @@ theorem mul_le_card_filterComplVertsAdjParts_mul
     _ ≤ #K.verts * (G.minDegree - #K.verts) - (n - #K.verts) * (#K.verts - (t' - t)) :=
         sub_le_sub_right (mul_le_mul_of_nonneg_left
           (sub_le_sub_right hδ _) (#K.verts).cast_nonneg) _
-    _ ≤ #(filterComplVertsAdjParts K t) * (t' - t) :=
-        sub_left_le_of_le_add <|
-          (le_card_edgeFinset_between_verts K).trans (card_edgeFinset_between_verts_le K hr_pos)
+    _ ≤ #(filter K t) * (t' - t) :=
+        sub_left_le_of_le_add <| (le_card_edgeFinset_between_verts K).trans
+          (card_edgeFinset_between_verts_le K hr_pos ht'_pos)
 
-/-- For `w ∈ filterComplVertsAdjParts`, there exists a `r` subets of vertices of size `t < t'`
+/-- For `w ∈ ErdosStone.filter`, there exists a `r` subets of vertices of size `t < t'`
 adjacent to `w`.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
-noncomputable abbrev filterComplVertsAdjParts.pi :
-    filterComplVertsAdjParts K t → Π i : Fin r, (K.parts i).powersetCard t :=
-  fun ⟨_, h⟩ i ↦
-    let s := Multiset.of_mem_filter h i
-    ⟨s.choose, s.choose_spec.1⟩
+noncomputable abbrev filter.pi :
+    filter K t → K.parts.pi (·.powersetCard t) :=
+  fun ⟨_, h⟩ ↦
+    let s := Multiset.of_mem_filter h
+    ⟨fun p hp ↦ (s p hp).choose, Finset.mem_pi.mpr fun p hp ↦ (s p hp).choose_spec.1⟩
 
-theorem filterComplVertsAdjParts.pi.mem_val (i : Fin r) (w : filterComplVertsAdjParts K t) :
-    ∀ v ∈ (filterComplVertsAdjParts.pi K w i).val, G.Adj w v :=
-  let s := Multiset.of_mem_filter w.prop i
+theorem filter.pi.mem_val {p} (hp : p ∈ K.parts) (w : filter K t) :
+    ∀ v ∈ (filter.pi K w).val p hp, G.Adj w v :=
+  let s := Multiset.of_mem_filter w.prop p hp
   s.choose_spec.right
 
-/-- If `#filterComplVertsAdjParts` is sufficently large, then there exist a `y` such that there
-are least `t` vertices in the fiber `filterComplVertsAdjParts.pi A · = y`.
+/-- If `#ErdosStone.filter` is sufficently large, then there exist a `y` such that there
+are least `t` vertices in the fiber `ErdosStone.filter.pi A · = y`.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
-theorem filterComplVertsAdjParts.pi.exists_le_card_fiber
-    (hr_pos : 0 < r) (ht_lt_t' : t < t') (hδ : G.minDegree ≥ (1 - 1 / r + ε) * n)
+theorem filter.pi.exists_le_card_fiber (hr_pos : 0 < r) (ht'_pos : 0 < t')
+    (ht_lt_t' : t < t') (hδ : G.minDegree ≥ (1 - 1 / r + ε) * n)
     (hN : (t'.choose t ^ r * t + r * t') * (t' - t) ≤ n * (r * t' * ε - t)) :
-    ∃ y : Π i : Fin r, (K.parts i).powersetCard t,
-      t ≤ #{ w | filterComplVertsAdjParts.pi K w = y } := by
-  have : Nonempty (Π i : Fin r, (K.parts i).powersetCard t) := by
-    simp_rw [Classical.nonempty_pi, nonempty_coe_sort, powersetCard_nonempty,
-      K.card_parts, ht_lt_t'.le, implies_true]
+    ∃ y : K.parts.pi (·.powersetCard t), t ≤ #{ w | filter.pi K w = y } := by
+  have : Nonempty (K.parts.pi (·.powersetCard t)) := by
+    simp_rw [nonempty_coe_sort, pi_nonempty, powersetCard_nonempty]
+    intro p hp
+    rw [K.card_mem_parts hp]
+    exact ht_lt_t'.le
   apply exists_le_card_fiber_of_mul_le_card
-  simp_rw [Fintype.card_pi, card_coe, card_powersetCard, K.card_parts,
-    prod_const, card_univ, Fintype.card_fin, ← @Nat.cast_le ℝ]
-  apply le_of_mul_le_mul_right
-  · exact mul_le_card_filterComplVertsAdjParts_mul K hr_pos hδ (mod_cast hN)
-  · rwa [← @Nat.cast_lt ℝ, ← sub_pos] at ht_lt_t'
+  simp_rw [card_coe, Finset.card_pi, card_powersetCard,
+    Finset.prod_congr rfl fun p hp ↦ show (#p).choose t = t'.choose t by rw [K.card_mem_parts hp],
+    prod_const, K.card_parts.resolve_right ht'_pos.ne']
+  exact_mod_cast le_of_mul_le_mul_right (mul_le_card_filter_mul K hr_pos ht'_pos hδ (mod_cast hN))
+    (sub_pos_of_lt <| mod_cast ht_lt_t' : 0 < (t' - t : ℝ))
 
 end ErdosStone
 
@@ -184,7 +187,7 @@ theorem completeEquipartiteGraph_isContained_of_minDegree
     have ht_lt_rt'ε : t < r * t' * ε := by
       rw [mul_comm (r : ℝ) (t' : ℝ), mul_assoc, ← div_lt_iff₀ (by positivity), Nat.cast_add_one]
       exact Nat.lt_floor_add_one (t / (r * ε))
-    have ht' : 0 < t' := by positivity
+    have ht'_pos : 0 < t' := by positivity
     have ⟨N', ih⟩ := completeEquipartiteGraph_isContained_of_minDegree hε' (r - 1) t'
     -- choose `N` at least `(t'.choose t ^ r * t + r * t') * (t '- t) / (r * t' * ε - t)` to
     -- satisfy the pigeonhole principle
@@ -205,7 +208,7 @@ theorem completeEquipartiteGraph_isContained_of_minDegree
       exact hδ.trans' (le_mul_of_one_le_left n.cast_nonneg h1_le_rε)
     have ht_lt_t' : t < t' := by
       rw [mul_comm (r : ℝ) (t' : ℝ), mul_assoc] at ht_lt_rt'ε
-      exact_mod_cast ht_lt_rt'ε.trans_le (mul_le_of_le_one_right (mod_cast ht'.le) hrε_lt_1.le)
+      exact_mod_cast ht_lt_rt'ε.trans_le (mul_le_of_le_one_right (mod_cast ht'_pos.le) hrε_lt_1.le)
     -- identify a `completeEquipartiteGraph r t'` in `G` from the inductive hypothesis
     replace ih : completeEquipartiteGraph r t' ⊑ G := by
       rcases eq_or_ne r 1 with hr_eq_1 | hr_ne_1
@@ -238,30 +241,60 @@ theorem completeEquipartiteGraph_isContained_of_minDegree
     obtain ⟨K⟩ := completeEquipartiteGraph_isContained_iff.mp ih
     -- find `t` vertices not in `K` adjacent to `t` vertices in each `K.parts` using the
     -- pigeonhole principle
-    obtain ⟨y, hy⟩ := by classical
-      apply ErdosStone.filterComplVertsAdjParts.pi.exists_le_card_fiber K hr_pos ht_lt_t' hδ
+    obtain ⟨⟨y, hy⟩, ht_le_card_filter⟩ := by classical
+      apply ErdosStone.filter.pi.exists_le_card_fiber K hr_pos ht'_pos ht_lt_t' hδ
       rw [← div_le_iff₀ (sub_pos_of_lt ht_lt_rt'ε)]
       trans (N : ℝ)
       · exact (Nat.le_ceil _).trans (Nat.cast_le.mpr <| le_max_right _ _)
       · exact_mod_cast hn
-    have ⟨s, hs_subset, hcards⟩ := exists_subset_card_eq hy
+    rw [Finset.mem_pi] at hy
+    have ⟨s, hs_subset, hcards⟩ := exists_subset_card_eq ht_le_card_filter
     -- identify the `t` vertices in each `K.parts` as a `CompleteEquipartiteSubgraph r t` in `K`
     let K' : G.CompleteEquipartiteSubgraph r t := by
-      refine ⟨fun i ↦ (y i).val, fun i ↦ (mem_powersetCard.mp (y i).prop).right,
-        fun i j hne v hv w hw ↦ ?_⟩
-      have hyi := mem_powersetCard.mp (y i).prop
-      have hyj := mem_powersetCard.mp (y j).prop
-      exact K.isCompleteBetween hne (hyi.1 hv) (hyj.1 hw)
+      refine ⟨univ.map ⟨fun p : K.parts ↦ y p.val p.prop, fun p₁ p₂ (heq : y p₁ _ = y p₂ _) ↦ ?_⟩,
+        ?_, fun {p} hp ↦ ?_, fun p₁ hp₁ p₂ hp₂ hne v₁ hv₁ v₂ hv₂ ↦ ?_⟩
+      · have hy₁' := mem_powersetCard.mp (hy p₁.val p₁.prop)
+        have hy₂' := mem_powersetCard.mp (hy p₂.val p₂.prop)
+        rw [← heq] at hy₂'
+        obtain ⟨v, hv⟩ : (y p₁ _).Nonempty := by
+          rw [← Finset.card_pos, hy₁'.right]
+          exact ht_pos
+        by_contra! hne
+        absurd K.isCompleteBetween p₁.prop p₂.prop
+          (Subtype.ext_iff.ne.mp hne) (hy₁'.left hv) (hy₂'.left hv)
+        exact G.loopless v
+      · simp_rw [card_map, card_univ, card_coe]
+        exact .inl (K.card_parts.resolve_right ht'_pos.ne')
+      · simp_rw [univ_eq_attach, Finset.mem_map, mem_attach,
+          Function.Embedding.coeFn_mk, true_and, Subtype.exists] at hp
+        replace ⟨p, hp, hyp⟩ := hp
+        rw [← hyp]
+        have hy' := mem_powersetCard.mp (hy p hp)
+        exact hy'.right
+      · simp_rw [univ_eq_attach, coe_map, Function.Embedding.coeFn_mk,
+          Set.mem_image, mem_coe, mem_attach, true_and, Subtype.exists] at hp₁ hp₂
+        replace ⟨p₁, hp₁, hyp₁⟩ := hp₁
+        rw [← hyp₁] at hv₁ hne
+        have hy₁' := mem_powersetCard.mp (hy p₁ hp₁)
+        replace ⟨p₂, hp₂, hyp₂⟩ := hp₂
+        rw [← hyp₂] at hv₂ hne
+        have hy₂' := mem_powersetCard.mp (hy p₂ hp₂)
+        refine K.isCompleteBetween hp₁ hp₂ ?_ (hy₁'.left hv₁) (hy₂'.left hv₂)
+        by_contra! heq
+        simp [← heq] at hne
     -- identify the `t` vertices not in `K` and the `CompleteEquipartiteSubgraph r t` in `K`
     -- as a `CompleteEquipartiteSubgraph (r + 1) t` in `G`
     refine completeEquipartiteGraph_succ_isContained_iff.mpr
-      ⟨K', s.map (.subtype _), by rwa [← card_map] at hcards, fun i v hv w hw ↦ ?_⟩
-    obtain ⟨w', hw', hw⟩ := Finset.mem_map.mp hw
-    apply hs_subset at hw'
-    classical rw [mem_filter] at hw'
-    rw [show K'.parts i = y i by rfl, ← hw'.2] at hv
-    rw [← hw, Function.Embedding.coe_subtype]
-    classical exact (ErdosStone.filterComplVertsAdjParts.pi.mem_val K i w' v hv).symm
+      ⟨K', s.map (.subtype _), by rwa [← card_map] at hcards, fun p' hp' v hv w hw ↦ ?_⟩
+    obtain ⟨w', hw'_mem, (hw'_eq : ↑w' = w)⟩ := Finset.mem_map.mp hw
+    simp_rw [K', univ_eq_attach, Finset.mem_map, mem_attach,
+      Function.Embedding.coeFn_mk, true_and, Subtype.exists] at hp'
+    obtain ⟨p, hp, hp'_eq⟩ : ∃ p, ∃ (h : p ∈ K.parts), y p h = p' := hp'
+    apply hs_subset at hw'_mem
+    simp_rw [mem_filter, mem_univ, true_and, Subtype.mk.injEq] at hw'_mem
+    rw [← hp'_eq, mem_coe, ← hw'_mem] at hv
+    rw [← hw'_eq]
+    exact (ErdosStone.filter.pi.mem_val K hp w' v hv).symm
 
 /-- Repeatedly remove minimal degree vertices until `(G.induce s).minDegree` is at least `c * #s`
 and count the edges removed in the process.
