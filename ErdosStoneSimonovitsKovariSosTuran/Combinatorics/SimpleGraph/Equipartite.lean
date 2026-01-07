@@ -168,6 +168,10 @@ theorem disjoint : (K.parts : Set (Finset V)).Pairwise Disjoint :=
 /-- The finset of vertices in a complete equipartite subgraph. -/
 def verts : Finset V := K.parts.disjiUnion id K.disjoint
 
+open Classical in
+/-- The finset of vertices in a complete equipartite subgraph as a `biUnion`. -/
+lemma verts_eq_biUnion : K.verts = K.parts.biUnion id := by rw [verts, disjiUnion_eq_biUnion]
+
 /-- There are `r * t` vertices in a complete equipartite subgraph with `r` parts of size `t`. -/
 theorem card_verts : #K.verts = r * t := by
   simp_rw [verts, card_disjiUnion, id_eq, sum_congr rfl fun _ ↦ K.card_mem_parts, sum_const,
@@ -177,11 +181,8 @@ theorem card_verts : #K.verts = r * t := by
 /-- A complete equipartite subgraph gives rise to a copy of a complete equipartite graph. -/
 noncomputable def toCopy : Copy (completeEquipartiteGraph r t) G := by
   by_cases ht : t = 0
-  · have : IsEmpty (Fin r × Fin t) := by simp [ht, Fin.isEmpty]
-    have h_bot : completeEquipartiteGraph r t = ⊥ := by
-      rw [completeEquipartiteGraph_eq_bot_iff]
-      exact .inr ht
-    rw [h_bot]
+  · rw [completeEquipartiteGraph_eq_bot_iff.mpr <| .inr ht]
+    have : IsEmpty (Fin r × Fin t) := by simp [ht, Fin.isEmpty]
     exact Copy.bot .ofIsEmpty
   · have : Nonempty (Fin r ↪ K.parts) := by
       rw [Embedding.nonempty_iff_card_le,
@@ -244,31 +245,29 @@ theorem completeEquipartiteGraph_isContained_iff :
   ⟨fun ⟨f⟩ ↦ ⟨CompleteEquipartiteSubgraph.ofCopy f⟩, fun ⟨K⟩ ↦ ⟨K.toCopy⟩⟩
 
 open Classical in
-/-- Simple graphs contain a copy of a `completeEquipartiteGraph (n + 1) t` iff there exists
-`s : Finset V` of size `#s = t` and `K : G.CompleteEquipartiteSubgraph n t` such that the
+/-- Simple graphs contain a copy of a `completeEquipartiteGraph (r + 1) t` iff there exists
+`s : Finset V` of size `#s = t` and `K : G.CompleteEquipartiteSubgraph r t` such that the
 vertices in `s` are adjacent to the vertices in `K`. -/
-theorem completeEquipartiteGraph_succ_isContained_iff {n : ℕ} :
-  completeEquipartiteGraph (n + 1) t ⊑ G
-    ↔ ∃ᵉ (K : G.CompleteEquipartiteSubgraph n t) (s : Finset V),
+theorem completeEquipartiteGraph_succ_isContained_iff :
+  completeEquipartiteGraph (r + 1) t ⊑ G
+    ↔ ∃ᵉ (K : G.CompleteEquipartiteSubgraph r t) (s : Finset V),
         #s = t ∧ ∀ p ∈ K.parts, G.IsCompleteBetween p s := by
   by_cases ht : t = 0
-  · have (n) : IsEmpty (Fin n × Fin t) := by simp [ht, Fin.isEmpty]
-    have h_bot (n) : completeEquipartiteGraph n t = ⊥ := by
-      rw [completeEquipartiteGraph_eq_bot_iff]
-      exact .inr ht
-    simp_rw [h_bot (n + 1), ht, Finset.card_eq_zero, exists_eq_left, IsCompleteBetween, mem_coe,
+  · have (r' : ℕ) : IsEmpty (Fin r' × Fin t) := by simp [ht, Fin.isEmpty]
+    have h_bot (r' : ℕ) : completeEquipartiteGraph r' t = ⊥ :=
+      completeEquipartiteGraph_eq_bot_iff.mpr <| .inr ht
+    simp_rw [h_bot (r + 1), ht, Finset.card_eq_zero, exists_eq_left, IsCompleteBetween, mem_coe,
       not_mem_empty, IsEmpty.forall_iff, implies_true, exists_true_iff_nonempty,
-      ← completeEquipartiteGraph_isContained_iff, h_bot n]
+      ← completeEquipartiteGraph_isContained_iff, h_bot r]
     exact ⟨fun _ ↦ ⟨Copy.bot .ofIsEmpty⟩, fun _ ↦ ⟨Copy.bot .ofIsEmpty⟩⟩
   · rw [completeEquipartiteGraph_isContained_iff]
     refine ⟨fun ⟨K'⟩ ↦ ?_, fun ⟨K, s, hs, hadj⟩ ↦ ?_⟩
     · obtain ⟨parts, hparts_sub, hparts_card⟩ := K'.parts.exists_subset_card_eq (Nat.pred_le _)
-      let K : G.CompleteEquipartiteSubgraph n t := by
-        refine ⟨parts, ?_, fun h ↦ ?_, fun _ h₁ _ h₂ hne ↦ ?_⟩
-        · rw [hparts_card, K'.card_parts.resolve_right ht]
-          exact .inl (Nat.pred_succ n)
-        · exact K'.card_mem_parts (hparts_sub h)
-        · exact K'.isCompleteBetween (hparts_sub h₁) (hparts_sub h₂) hne
+      let K : G.CompleteEquipartiteSubgraph r t := by
+        refine ⟨parts, ?_, fun h ↦ K'.card_mem_parts (hparts_sub h),
+          fun _ h₁ _ h₂ hne ↦ K'.isCompleteBetween (hparts_sub h₁) (hparts_sub h₂) hne⟩
+        rw [hparts_card, K'.card_parts.resolve_right ht]
+        exact .inl (Nat.pred_succ r)
       obtain ⟨s, nhs_mem, hs⟩ : ∃ s ∉ K.parts, insert s K.parts = K'.parts := by
         refine exists_eq_insert_iff.mpr ⟨hparts_sub, ?_⟩
         rw [K.card_parts.resolve_right ht, K'.card_parts.resolve_right ht]
