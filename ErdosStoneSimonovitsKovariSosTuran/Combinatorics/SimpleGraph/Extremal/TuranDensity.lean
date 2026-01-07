@@ -2,7 +2,7 @@ import Mathlib
 import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.DeleteEdges
 import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Basic
 import ErdosStoneSimonovitsKovariSosTuran.Order.Monotone.Basic
-import ErdosStoneSimonovitsKovariSosTuran.Topology.Instances.NNReal.Lemmas
+import ErdosStoneSimonovitsKovariSosTuran.Topology.Instances.Real.Lemmas
 
 open Asymptotics Filter Finset Fintype Topology
 
@@ -52,9 +52,9 @@ theorem isGLB_turanDensity (H : SimpleGraph W) :
     refine ⟨0, fun x ⟨_, _, hx⟩ ↦ ?_⟩
     rw [← hx]
     positivity
-  apply Real.isGLB_of_bddBelow_antitoneOn_Ici_tendsto
+  apply Real.isGLB_of_bddBelow_antitoneOn_Ici_tendsto_nat
     h_bdd (antitoneOn_extremalNumber_div_choose_two H)
-  have h_tto := Real.tendsto_csInf_of_bddBelow_antitoneOn_Ici
+  have h_tto := Real.tendsto_csInf_of_bddBelow_antitoneOn_Ici_nat
     h_bdd (antitoneOn_extremalNumber_div_choose_two H)
   rwa [← h_tto.limUnder_eq] at h_tto
 
@@ -66,7 +66,7 @@ theorem turanDensity_eq_csInf (H : SimpleGraph W) :
 /-- The **Turán density** of a simple graph `H` is well-defined. -/
 theorem tendsto_turanDensity (H : SimpleGraph W) :
     Tendsto (fun n ↦ (extremalNumber n H / n.choose 2 : ℝ)) atTop (𝓝 (turanDensity H)) := by
-  have h_tendsto := Real.tendsto_csInf_of_bddBelow_antitoneOn_Ici
+  have h_tendsto := Real.tendsto_csInf_of_bddBelow_antitoneOn_Ici_nat
     (isGLB_turanDensity H).bddBelow (antitoneOn_extremalNumber_div_choose_two H)
   rwa [turanDensity, h_tendsto.limUnder_eq]
 
