@@ -52,10 +52,10 @@ theorem isGLB_turanDensity (H : SimpleGraph W) :
     refine ⟨0, fun x ⟨_, _, hx⟩ ↦ ?_⟩
     rw [← hx]
     positivity
-  apply Real.isGLB_of_bddBelow_antitoneOn_Ici_tendsto_nat
-    h_bdd (antitoneOn_extremalNumber_div_choose_two H)
-  have h_tto := Real.tendsto_csInf_of_bddBelow_antitoneOn_Ici_nat
-    h_bdd (antitoneOn_extremalNumber_div_choose_two H)
+  refine Real.isGLB_of_tendsto_antitoneOn_bddBelow_nat_Ici ?_
+    (antitoneOn_extremalNumber_div_choose_two H) h_bdd
+  have h_tto := Real.tendsto_atTop_csInf_of_antitoneOn_bddBelow_nat_Ici
+    (antitoneOn_extremalNumber_div_choose_two H) h_bdd
   rwa [← h_tto.limUnder_eq] at h_tto
 
 theorem turanDensity_eq_csInf (H : SimpleGraph W) :
@@ -66,8 +66,8 @@ theorem turanDensity_eq_csInf (H : SimpleGraph W) :
 /-- The **Turán density** of a simple graph `H` is well-defined. -/
 theorem tendsto_turanDensity (H : SimpleGraph W) :
     Tendsto (fun n ↦ (extremalNumber n H / n.choose 2 : ℝ)) atTop (𝓝 (turanDensity H)) := by
-  have h_tendsto := Real.tendsto_csInf_of_bddBelow_antitoneOn_Ici_nat
-    (isGLB_turanDensity H).bddBelow (antitoneOn_extremalNumber_div_choose_two H)
+  have h_tendsto := Real.tendsto_atTop_csInf_of_antitoneOn_bddBelow_nat_Ici
+    (antitoneOn_extremalNumber_div_choose_two H) (isGLB_turanDensity H).bddBelow
   rwa [turanDensity, h_tendsto.limUnder_eq]
 
 /-- `extremalNumber n H` is asymptotically equivalent to `turanDensity H * n.choose 2` as `n`
