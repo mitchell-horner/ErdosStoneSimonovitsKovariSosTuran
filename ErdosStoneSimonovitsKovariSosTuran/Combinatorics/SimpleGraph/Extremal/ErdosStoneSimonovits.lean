@@ -167,13 +167,14 @@ end ErdosStone
 copy of a `completeEquipartiteGraph` in `r + 1` parts each of size `t`.
 
 This is the minimal-degree version of the **Erdős-Stone theorem**. -/
-theorem completeEquipartiteGraph_isContained_of_minDegree
+theorem eventually_completeEquipartiteGraph_isContained_of_minDegree
     {ε : ℝ} (hε : 0 < ε) (r t : ℕ) :
-    ∃ N, ∀ n ≥ N, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
+    ∀ᶠ n in atTop, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
       G.minDegree ≥ (1 - 1 / r + ε) * n
         → completeEquipartiteGraph (r + 1) t ⊑ G := by
   rcases show (r = 0 ∨ t = 0) ∨ r ≠ 0 ∧ t ≠ 0 by tauto with h0 | ⟨hr_pos, ht_pos⟩
   · rw [← Nat.le_zero_eq, ← @Nat.add_le_add_iff_right r 0 1, zero_add] at h0
+    rw [eventually_atTop]
     refine ⟨(r + 1) * t, fun n hn {G} _ _ ↦ ?_⟩
     rw [completeEquipartiteGraph_eq_bot_iff.mpr h0, bot_isContained_iff_card_le,
       card_prod, Fintype.card_fin, Fintype.card_fin, Fintype.card_fin]
@@ -188,11 +189,12 @@ theorem completeEquipartiteGraph_isContained_of_minDegree
       rw [mul_comm (r : ℝ) (t' : ℝ), mul_assoc, ← div_lt_iff₀ (by positivity), Nat.cast_add_one]
       exact Nat.lt_floor_add_one (t / (r * ε))
     have ht'_pos : 0 < t' := by positivity
-    have ⟨N', ih⟩ := completeEquipartiteGraph_isContained_of_minDegree hε' (r - 1) t'
+    have ⟨N', ih⟩ := eventually_atTop.mp <|
+      eventually_completeEquipartiteGraph_isContained_of_minDegree hε' (r - 1) t'
     -- choose `N` at least `(t'.choose t ^ r * t + r * t') * (t '- t) / (r * t' * ε - t)` to
     -- satisfy the pigeonhole principle
     let N := max (max 1 N') ⌈(t'.choose t ^ r * t + r * t') * (t' - t) / (r * t' * ε - t)⌉₊
-    refine ⟨N, fun n hn {G} _ hδ ↦ ?_⟩
+    refine eventually_atTop.mpr ⟨N, fun n hn {G} _ hδ ↦ ?_⟩
     have : Nonempty (Fin n) := by
       rw [← Fin.pos_iff_nonempty]
       exact hn.trans_lt' (lt_max_of_lt_left (lt_max_of_lt_left zero_lt_one))
@@ -404,19 +406,20 @@ lemma exists_induce_minDegree_ge_and_card_sq_ge {V : Type*} [Fintype V] [Decidab
 copy of a `completeEquipartiteGraph (r + 1) t`.
 
 This is the **Erdős-Stone theorem**. -/
-theorem completeEquipartiteGraph_isContained_of_card_edgeFinset
+theorem eventually_completeEquipartiteGraph_isContained_of_card_edgeFinset
     {ε : ℝ} (hε_pos : 0 < ε) (r t : ℕ) :
-    ∃ N, ∀ n ≥ N, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
+    ∀ᶠ n in atTop, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
       #G.edgeFinset ≥ (1 - 1 / r + ε) * n ^ 2 / 2
-      → completeEquipartiteGraph (r + 1) t ⊑ G := by
+        → completeEquipartiteGraph (r + 1) t ⊑ G := by
   -- choose `c + ε' = (1 - 1 / r + ε / 2) + ε / 2 = 1 - 1 / r + ε`
   let ε' := ε / 2
   have hε' : 0 < ε' := by positivity
   let c := 1 - 1 / r + ε / 2
   have hc : 0 < c := add_pos_of_nonneg_of_pos r.one_sub_one_div_cast_nonneg hε'
   -- find `N' > n` sufficent for the minimal-degree version of the Erdős-Stone theorem
-  have ⟨N', ih⟩ := completeEquipartiteGraph_isContained_of_minDegree hε' r t
-  refine ⟨⌈c / ε' + N' / √ε'⌉₊, fun n hn {G} _ h ↦ ?_⟩
+  have ⟨N', ih⟩ := eventually_atTop.mp <|
+    eventually_completeEquipartiteGraph_isContained_of_minDegree hε' r t
+  refine eventually_atTop.mpr ⟨⌈c / ε' + N' / √ε'⌉₊, fun n hn {G} _ h ↦ ?_⟩
   rw [ge_iff_le, Nat.ceil_le] at hn
   -- find `s` such that `G.induce s` has appropriate minimal-degree
   conv_rhs at h =>
@@ -471,9 +474,9 @@ theorem completeEquipartiteGraph_isContained_of_card_edgeFinset
 copy of any `r + 1`-colorable graph.
 
 This is a corollary of the **Erdős-Stone theorem**. -/
-theorem isContained_of_card_edgeFinset_of_colorable
+theorem eventually_isContained_of_card_edgeFinset_of_colorable
     {r : ℕ} (hc : H.Colorable (r + 1)) {ε : ℝ} (hε_pos : 0 < ε) :
-    ∃ N, ∀ n ≥ N, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
+    ∀ᶠ n in atTop, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
       #G.edgeFinset ≥ (1 - 1 / r + ε) * n ^ 2 / 2 → H ⊑ G := by
   obtain ⟨C⟩ := hc
   let f := fun c ↦ card (C.colorClass c)
@@ -481,8 +484,9 @@ theorem isContained_of_card_edgeFinset_of_colorable
     refine isContained_completeEquipartiteGraph_of_colorable C (univ.sup f) (fun c ↦ ?_)
     rw [show card (C.colorClass c) = f c from rfl]
     exact le_sup (mem_univ c)
-  have ⟨N, ih⟩ := completeEquipartiteGraph_isContained_of_card_edgeFinset hε_pos r (univ.sup f)
-  exact ⟨N, fun n hn {G} _ h ↦ hH.trans (ih n hn h)⟩
+  have ⟨N, ih⟩ := eventually_atTop.mp <|
+    eventually_completeEquipartiteGraph_isContained_of_card_edgeFinset hε_pos r (univ.sup f)
+  exact eventually_atTop.mpr ⟨N, fun n hn {G} _ h ↦ hH.trans (ih n hn h)⟩
 
 end ErdosStone
 
@@ -494,17 +498,18 @@ namespace ErdosStoneSimonovits
 `(1 - 1 / r + o(1)) * n ^ 2 / 2`.
 
 This is an auxiliary definition for the **Erdős-Stone-Simonovits theorem**. -/
-lemma extremalNumber_le_of_colorable
+lemma eventually_extremalNumber_le_of_colorable
     {r : ℕ} (hc : H.Colorable (r + 1)) {ε : ℝ} (hε_pos : 0 < ε) :
-    ∃ N, ∀ n > N, extremalNumber n H ≤ (1 - 1 / r + ε) * n ^ 2 / 2 := by
-  obtain ⟨N, h⟩ := isContained_of_card_edgeFinset_of_colorable hc hε_pos
+    ∀ᶠ n in atTop, extremalNumber n H ≤ (1 - 1 / r + ε) * n ^ 2 / 2 := by
+  obtain ⟨N, h⟩ := eventually_atTop.mp <|
+    eventually_isContained_of_card_edgeFinset_of_colorable hc hε_pos
   have hpos : 0 ≤ 1 - 1 / r + ε := add_nonneg r.one_sub_one_div_cast_nonneg hε_pos.le
   conv =>
-    enter [1, N, n, hn]
+    enter [1, n]
     rw [← Fintype.card_fin n, extremalNumber_le_iff_of_nonneg _ (by positivity)]
-  refine ⟨N, fun n hn {G} _ hfree ↦ ?_⟩
+  refine eventually_atTop.mpr ⟨N, fun n hn {G} _ h_free ↦ ?_⟩
   rw [Fintype.card_fin n]
-  contrapose! hfree with hcard_edges
+  contrapose! h_free with hcard_edges
   rw [not_free]
   exact h n hn.le hcard_edges.le
 
@@ -513,11 +518,11 @@ omit [Fintype W] in
 `(1 - 1 / r - o(1)) * n ^ 2 / 2`.
 
 This is an auxiliary definition for the **Erdős-Stone-Simonovits theorem**. -/
-lemma lt_extremalNumber_of_not_colorable
+lemma eventually_le_extremalNumber_of_not_colorable
     {r : ℕ} (hr_pos : 0 < r) (nhc : ¬H.Colorable r) {ε : ℝ} (hε_pos : 0 < ε) :
-    ∃ N, ∀ n > N, (1 - 1 / r - ε) * n ^ 2 / 2 < extremalNumber n H := by
-  refine ⟨⌊2 * r / ε⌋₊, fun n hn_lt ↦ ?_⟩
-  have hn_pos : 0 < n := Nat.zero_lt_of_lt hn_lt
+    ∀ᶠ n in atTop, (1 - 1 / r - ε) * n ^ 2 / 2 ≤ extremalNumber n H := by
+  refine eventually_atTop.mpr ⟨⌈2 * r / ε⌉₊, fun n hn ↦ ?_⟩
+  rw [ge_iff_le, Nat.ceil_le, div_le_iff₀' hε_pos] at hn
   let G := completeEquipartiteGraph r (n / r)
   -- `completeEquipartiteGraph` is `r`-colorable
   have : Nonempty (Fin r × Fin (n / r) ↪ Fin n) := by
@@ -526,14 +531,12 @@ lemma lt_extremalNumber_of_not_colorable
     exact Nat.mul_div_le n r
   let f := Classical.arbitrary (Fin r × Fin (n / r) ↪ Fin n)
   -- `completeEquipartiteGraph` has sufficently many edges
-  have hcard_edges : #G.edgeFinset > (1 - 1 / r - ε) * n ^ 2 / 2 := by
+  have hcard_edges : (1 - 1 / r - ε) * n ^ 2 / 2 ≤ #G.edgeFinset := by
     calc (1 - 1 / r - ε) * n ^ 2 / 2
-      _ < (1 - 1 / r) * n ^ 2 / 2 - r * n := by
-          rw [sub_mul, sub_div, sub_lt_sub_iff_left, lt_div_iff₀ zero_lt_two,
+      _ ≤ (1 - 1 / r) * n ^ 2 / 2 - r * n := by
+          rw [sub_mul, sub_div, sub_le_sub_iff_left, le_div_iff₀ zero_lt_two,
             mul_comm, ← mul_assoc, pow_two, ← mul_assoc]
-          have h2r_lt_εn : 2 * r < ε * n := by
-            rwa [gt_iff_lt, Nat.floor_lt (by positivity), div_lt_iff₀' hε_pos] at hn_lt
-          exact mul_lt_mul_of_pos_right h2r_lt_εn (mod_cast hn_pos)
+          exact mul_le_mul_of_nonneg_right hn n.cast_nonneg
       _ = (1 - 1 / r) * r ^ 2 * (n / r : ℕ) ^ 2 / 2
         + (1 - 1 / r) * (n * ↑(n % r)) - (1 - 1 / r) * ↑(n % r) ^ 2 / 2 - r * n := by
           conv in (1 - 1 / r) * (n : ℝ) ^ 2 / 2 =>
@@ -550,15 +553,15 @@ lemma lt_extremalNumber_of_not_colorable
           · apply div_nonneg _ zero_le_two
             exact mul_nonneg (r.one_sub_one_div_cast_nonneg) (by positivity)
           · apply mul_le_mul _ (mod_cast (n.mod_lt hr_pos).le)
-              (n % r).cast_nonneg (mod_cast hn_pos.le)
-            exact mul_le_of_le_one_left (mod_cast hn_pos.le) r.one_sub_one_div_cast_le_one
+              (n % r).cast_nonneg n.cast_nonneg
+            exact mul_le_of_le_one_left n.cast_nonneg r.one_sub_one_div_cast_le_one
       _ = #(completeEquipartiteGraph r (n / r)).edgeFinset := by
           rw [card_edgeFinset_completeEquipartiteGraph, Nat.cast_mul, Nat.cast_pow,
             Nat.cast_choose_two, div_mul_eq_mul_div, sub_mul, div_mul_eq_mul_div, pow_two,
             ← mul_assoc, mul_div_assoc _ (r : ℝ) (r : ℝ), ← mul_sub, one_mul,
             div_self (mod_cast hr_pos.ne')]
   rw [← G.card_edgeFinset_map f] at hcard_edges
-  apply lt_of_lt_of_le hcard_edges
+  apply hcard_edges.trans
   -- `H` is not contained in `completeEquipartiteGraph`
   conv_rhs => rw [← Fintype.card_fin n]
   refine mod_cast card_edgeFinset_le_extremalNumber ?_
@@ -567,20 +570,22 @@ lemma lt_extremalNumber_of_not_colorable
 
 end ErdosStoneSimonovits
 
-/-- If the chromatic number of `H` equals `r + 1 > 0`, then `extremalNumber n H` is greater
-than `(1 - 1 / r - o(1)) * n ^ 2 / 2` and at most `(1 - 1 / r + o(1)) * n ^ 2 / 2`.
+/-- If the chromatic number of `H` equals `r + 1 > 0`, then `extremalNumber n H` is at least
+`(1 - 1 / r - o(1)) * n ^ 2 / 2` and at most `(1 - 1 / r + o(1)) * n ^ 2 / 2`.
 
 This is the **Erdős-Stone-Simonovits theorem**. -/
-theorem lt_extremalNumber_le_of_chromaticNumber {ε : ℝ} (hε : 0 < ε)
+theorem eventually_le_extremalNumber_le_of_chromaticNumber {ε : ℝ} (hε : 0 < ε)
     {r : ℕ} (hr_pos : 0 < r) (hχ : H.chromaticNumber = r + 1) :
-    ∃ N, ∀ n > N, (1 - 1 / r - ε) * n ^ 2 / 2 < extremalNumber n H ∧
+    ∀ᶠ n in atTop, (1 - 1 / r - ε) * n ^ 2 / 2 ≤ extremalNumber n H ∧
       extremalNumber n H ≤ (1 - 1 / r + ε) * n ^ 2 / 2 := by
   have ⟨hc, nhc⟩ := chromaticNumber_eq_iff_colorable_not_colorable.mp hχ
-  have ⟨N₁, h₁⟩ := ErdosStoneSimonovits.extremalNumber_le_of_colorable hc hε
-  have ⟨N₂, h₂⟩ := ErdosStoneSimonovits.lt_extremalNumber_of_not_colorable hr_pos nhc hε
-  refine ⟨max N₁ N₂, fun n hn ↦ ?_⟩
-  have hn₁ := hn.trans_le' (Nat.le_max_left N₁ N₂)
-  have hn₂ := hn.trans_le' (Nat.le_max_right N₁ N₂)
+  have ⟨N₁, h₁⟩ := eventually_atTop.mp <|
+    ErdosStoneSimonovits.eventually_extremalNumber_le_of_colorable hc hε
+  have ⟨N₂, h₂⟩ := eventually_atTop.mp <|
+    ErdosStoneSimonovits.eventually_le_extremalNumber_of_not_colorable hr_pos nhc hε
+  refine eventually_atTop.mpr ⟨max N₁ N₂, fun n hn ↦ ?_⟩
+  have hn₁ := hn.trans' (Nat.le_max_left N₁ N₂)
+  have hn₂ := hn.trans' (Nat.le_max_right N₁ N₂)
   exact ⟨h₂ n hn₂, h₁ n hn₁⟩
 
 /-- If the chromatic number of `H` equals `r + 1 > 0`, then the `extremalNumber` of `H` is equal
@@ -591,14 +596,14 @@ theorem isLittleO_extremalNumber_of_chromaticNumber
     {r : ℕ} (hr_pos : 0 < r) (hχ : H.chromaticNumber = r + 1) :
     (fun (n : ℕ) ↦ (extremalNumber n H - (1 - 1 / r) * n ^ 2 / 2 : ℝ))
       =o[atTop] (fun (n : ℕ) ↦ (n ^ 2 : ℝ)) := by
-  simp_rw [isLittleO_iff, eventually_atTop]
+  rw [isLittleO_iff]
   intro ε hε
-  have ⟨n₀, h⟩ := lt_extremalNumber_le_of_chromaticNumber hε hr_pos hχ
-  refine ⟨n₀ + 1, fun n (hn : n₀ < n) ↦ ?_⟩
+  have ⟨N, h⟩ := eventually_atTop.mp <|
+    eventually_le_extremalNumber_le_of_chromaticNumber hε hr_pos hχ
+  refine eventually_atTop.mpr ⟨N, fun n hn ↦ ?_⟩
   specialize h n hn
   rw [norm_eq_abs, ← abs_of_pos hε, norm_eq_abs, ← abs_mul]
-  apply abs_le_abs
-  all_goals linarith
+  exact abs_le_abs (by linarith) (by linarith)
 
 /-- If the chromatic number of `H` equals `r + 1 > 0`, then the limit
 `extremalNumber n H / n.choose 2` approaches `1 - 1 / r` as `n → ∞`.
@@ -644,12 +649,12 @@ theorem isEquivalent_extremalNumber_of_chromaticNumber
 contains a copy of `H`.
 
 This is a corollary of the **Erdős-Stone-Simonovits theorem**. -/
-theorem isContained_of_card_edgeFinset_of_chromaticNumber
+theorem eventually_isContained_of_card_edgeFinset_of_chromaticNumber
     {r : ℕ} (hr_pos : 0 < r) (hχ : H.chromaticNumber = r + 1) {ε : ℝ} (hε_pos : 0 < ε) :
-    ∃ N, ∀ n ≥ N, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
+    ∀ᶠ n in atTop, ∀ {G : SimpleGraph (Fin n)} [DecidableRel G.Adj],
       #G.edgeFinset ≥ (1 - 1 / r + ε) * n.choose 2 → H ⊑ G := by
   rw [← turanDensity_eq_of_chromaticNumber hr_pos hχ]
-  exact isContained_of_card_edgeFinset H hε_pos
+  exact eventually_isContained_of_card_edgeFinset H hε_pos
 
 end ErdosStoneSimonovits
 
