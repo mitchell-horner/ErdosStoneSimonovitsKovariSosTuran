@@ -6,8 +6,7 @@ namespace SimpleGraph
 
 /-- The isomorphism between `completeBipartiteGraph α₁ β₁` and
 `completeBipartiteGraph α₂ β₂ ` where `α₁ ≃ α₂` and `β₁ ≃ β₂`. -/
-noncomputable def completeBipartiteGraph.congr {α₁ α₂ β₁ β₂ : Type*}
-  [Fintype α₁] [Fintype α₂] [Fintype β₂] [Fintype β₂] (hα : α₁ ≃ α₂) (hβ : β₁ ≃ β₂) :
+def completeBipartiteGraph.congr {α₁ α₂ β₁ β₂ : Type*} (hα : α₁ ≃ α₂) (hβ : β₁ ≃ β₂) :
     completeBipartiteGraph α₁ β₁ ≃g completeBipartiteGraph α₂ β₂ where
   toFun := Sum.map hα hβ
   invFun := Sum.map hα.symm hβ.symm
