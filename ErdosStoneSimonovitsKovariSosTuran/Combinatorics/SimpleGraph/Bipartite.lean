@@ -362,7 +362,7 @@ theorem bipartiteDoubleCover_card_edgeFinset [Fintype V] [DecidableRel G.Adj] :
   apply card_bij (fun (v, w) _ ↦ s(.inl v, .inr w)) (fun _ h ↦ by simpa using h)
     (fun (_, _) _ (_, _) _ ↦ by simp) (fun e he ↦ ?_)
   induction' e with v w
-  rw [Set.mem_toFinset, mem_edgeSet] at he
+  rw [mem_edgeFinset, mem_edgeSet] at he
   match v, w with
   | .inl _, .inr _ => simpa using he
   | .inr _, .inl _ => simpa using he.symm
