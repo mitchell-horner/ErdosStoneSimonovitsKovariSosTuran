@@ -131,5 +131,4 @@ theorem isContained_of_card_edgeFinset (H : SimpleGraph W) {ε : ℝ} (hε_pos :
   apply Nat.find_spec <| eventually_atTop.mp <| eventually_isContained_of_card_edgeFinset H hε_pos
   simpa only [turanDensityConst, hε_pos, ↓reduceDIte] using h_verts
 
-
 end SimpleGraph
