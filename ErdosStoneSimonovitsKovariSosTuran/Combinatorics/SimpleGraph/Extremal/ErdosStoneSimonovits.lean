@@ -24,7 +24,7 @@ subgraph, in `r` parts each of size `t'`, adjacent to at least `t` vertices in e
 complete equipartite subgraph.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
-abbrev filter (t : ℕ) : Finset (Fin n) :=
+def filter (t : ℕ) : Finset (Fin n) :=
   { v ∈ K.vertsᶜ | ∀ p ∈ K.parts, ∃ s ∈ p.powersetCard t, ∀ w ∈ s, G.Adj v w }
 
 theorem filter_subset_compl_verts : filter K t ⊆ K.vertsᶜ :=
@@ -51,8 +51,8 @@ This is an auxiliary definition for the **Erdős-Stone theorem**. -/
 lemma degree_between_verts_lt_of_mem_sdiff
     {v : Fin n} (hv : v ∈ K.vertsᶜ \ filter K t) (ht'_pos : 0 < t') :
     (G.between K.verts K.vertsᶜ).degree v < #K.verts - t' + t := by
-  simp_rw [mem_sdiff, mem_filter, not_and_or, and_or_left, and_not_self_iff, false_or,
-    not_forall, not_exists, not_and_or, not_forall, exists_prop] at hv
+  simp_rw [mem_sdiff, ErdosStone.filter, mem_filter, not_and_or, and_or_left, and_not_self_iff,
+    false_or, not_forall, not_exists, not_and_or, not_forall, exists_prop] at hv
   obtain ⟨hv, p, hp, hs⟩ := hv
   rw [← card_neighborFinset_eq_degree,
     isBipartiteWith_neighborFinset' (between_verts_isBipartiteWith K) hv]
@@ -83,7 +83,7 @@ lemma card_edgeFinset_between_verts_le (hr_pos : 0 < r) (ht'_pos : 0 < t') :
   calc (#(G.between K.verts K.vertsᶜ).edgeFinset : ℝ)
     _ = ∑ v ∈ K.vertsᶜ \ filter K t, ((G.between K.verts K.vertsᶜ).degree v : ℝ)
       + ∑ v ∈ filter K t, ((G.between K.verts K.vertsᶜ).degree v : ℝ) := by
-        rw [sum_sdiff (filter_subset _ K.vertsᶜ), eq_comm]
+        rw [ErdosStone.filter, sum_sdiff (filter_subset _ K.vertsᶜ), eq_comm]
         exact_mod_cast isBipartiteWith_sum_degrees_eq_card_edges'
           (between_verts_isBipartiteWith K)
     _ ≤ ∑ _ ∈ K.vertsᶜ \ filter K t, (#K.verts - t' + t : ℝ)
@@ -130,7 +130,7 @@ theorem mul_le_card_filter_mul (hr_pos : 0 < r) (ht'_pos : 0 < t')
 adjacent to `w`.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
-noncomputable abbrev filter.pi :
+noncomputable def filter.pi :
     filter K t → K.parts.pi (·.powersetCard t) :=
   fun ⟨_, h⟩ ↦
     let s := Multiset.of_mem_filter h
@@ -293,7 +293,7 @@ theorem eventually_completeEquipartiteGraph_isContained_of_minDegree
       Function.Embedding.coeFn_mk, true_and, Subtype.exists] at hp'
     obtain ⟨p, hp, hp'_eq⟩ : ∃ p, ∃ (h : p ∈ K.parts), y p h = p' := hp'
     apply hs_subset at hw'_mem
-    simp_rw [mem_filter, mem_univ, true_and, Subtype.mk.injEq] at hw'_mem
+    simp_rw [mem_filter, mem_univ, true_and, ErdosStone.filter.pi, Subtype.mk.injEq] at hw'_mem
     rw [← hp'_eq, mem_coe, ← hw'_mem] at hv
     rw [← hw'_eq]
     exact (ErdosStone.filter.pi.mem_val K hp w' v hv).symm
