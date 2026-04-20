@@ -141,7 +141,7 @@ theorem filter.pi.mem_val {p} (hp : p ∈ K.parts) (w : filter K t) :
   let s := Multiset.of_mem_filter w.prop p hp
   s.choose_spec.right
 
-/-- If `#ErdosStone.filter` is sufficently large, then there exist a `y` such that there
+/-- If `#ErdosStone.filter` is sufficiently large, then there exist a `y` such that there
 are least `t` vertices in the fiber `ErdosStone.filter.pi A · = y`.
 
 This is an auxiliary definition for the **Erdős-Stone theorem**. -/
@@ -155,11 +155,20 @@ theorem filter.pi.exists_le_card_fiber (hr_pos : 0 < r) (ht'_pos : 0 < t')
     rw [K.card_mem_parts hp]
     exact ht_lt_t'.le
   apply exists_le_card_fiber_of_mul_le_card
-  simp_rw [card_coe, Finset.card_pi, card_powersetCard,
-    Finset.prod_congr rfl fun p hp ↦ show (#p).choose t = t'.choose t by rw [K.card_mem_parts hp],
-    prod_const, K.card_parts.resolve_right ht'_pos.ne']
-  exact_mod_cast le_of_mul_le_mul_right (mul_le_card_filter_mul K hr_pos ht'_pos hδ (mod_cast hN))
-    (sub_pos_of_lt <| mod_cast ht_lt_t' : 0 < (t' - t : ℝ))
+  simp_rw [card_coe]
+  calc #(K.parts.pi (·.powersetCard t)) * t
+    _ = (∏ x ∈ K.parts, (#x).choose t) * t := by
+        simp_rw [Finset.card_pi, card_powersetCard]
+    _ = (∏ p ∈ K.parts, t'.choose t) * t :=
+        congrArg (· * t) <| prod_congr rfl
+          fun p hp ↦ congrArg (Nat.choose · t) <| K.card_mem_parts hp
+    _ ≤ t'.choose t ^ r * t := by
+        rw [prod_const, K.card_parts.resolve_right ht'_pos.ne']
+    _ ≤ #(filter K t) := by
+        refine Nat.le_of_mul_le_mul_right ?_ (Nat.sub_pos_of_lt ht_lt_t')
+        rw [← @Nat.cast_le ℝ, Nat.cast_mul _ (t' - t), Nat.cast_mul _ (t' - t),
+          Nat.cast_sub ht_lt_t'.le]
+        exact mul_le_card_filter_mul K hr_pos ht'_pos hδ (mod_cast hN)
 
 end ErdosStone
 
@@ -426,7 +435,7 @@ theorem eventually_completeEquipartiteGraph_isContained_of_card_edgeFinset
     rw [← add_halves ε, ← add_assoc, ← Fintype.card_fin n]
   obtain ⟨s, hδ, hcards_sq⟩ := exists_induce_minDegree_ge_and_card_sq_ge hc.le h
   rw [Fintype.card_fin n] at hcards_sq
-  -- assume `#s` is sufficently large
+  -- assume `#s` is sufficiently large
   suffices hcards_sq : (N' ^ 2 : ℝ) ≤ (#s ^ 2 : ℝ) by classical
     rw [← Nat.cast_pow, ← Nat.cast_pow, Nat.cast_le,
       Nat.pow_le_pow_iff_left two_ne_zero] at hcards_sq
@@ -449,7 +458,7 @@ theorem eventually_completeEquipartiteGraph_isContained_of_card_edgeFinset
         mul_one, sub_nonneg, ← div_le_iff₀' (mul_pos two_pos hε')]
       rw [interior_Ici, Set.mem_Ioi] at hx
       exact hx.le
-  -- prove `#s` is sufficently large
+  -- prove `#s` is sufficiently large
   calc (#s ^ 2 : ℝ)
     _ ≥ ε'* n ^ 2 - c * n := hcards_sq
     _ ≥ ε' * (c / ε' + N' / √ε') ^ 2 - c * (c / ε' + N' / √ε') := by
@@ -530,7 +539,7 @@ lemma eventually_le_extremalNumber_of_not_colorable
     rw [card_prod, Fintype.card_fin, Fintype.card_fin, Fintype.card_fin]
     exact Nat.mul_div_le n r
   let f := Classical.arbitrary (Fin r × Fin (n / r) ↪ Fin n)
-  -- `completeEquipartiteGraph` has sufficently many edges
+  -- `completeEquipartiteGraph` has sufficiently many edges
   have hcard_edges : (1 - 1 / r - ε) * n ^ 2 / 2 ≤ #G.edgeFinset := by
     calc (1 - 1 / r - ε) * n ^ 2 / 2
       _ ≤ (1 - 1 / r) * n ^ 2 / 2 - r * n := by
