@@ -4,7 +4,15 @@ open Finset Function Set.Notation
 
 namespace SimpleGraph
 
-variable {V : Type*} (G : SimpleGraph V)
+variable {V W : Type*} (G : SimpleGraph V)
+
+/-- `completeBipartiteGraph V W` has no edges iff `V` or `W` is empty. -/
+theorem completeBipartiteGraph_eq_bot:
+    completeBipartiteGraph V W = ⊥ ↔ IsEmpty V ∨ IsEmpty W := by
+  simp_rw [eq_bot_iff, ← isSubgraph_eq_le, IsSubgraph, bot_adj, imp_false, ← not_exists,
+    Sum.exists, completeBipartiteGraph_adj, Sum.isLeft_inl, Sum.isLeft_inr, Sum.isRight_inl,
+    Sum.isRight_inr, exists_prop', Bool.false_eq_true, and_false, false_or, or_false, and_true,
+    and_false, false_or, or_false, and_comm, or_self, not_and_or, not_nonempty_iff]
 
 lemma neighborSet_subset_support (v : V) : G.neighborSet v ⊆ G.support :=
   fun _ hadj ↦ ⟨v, hadj.symm⟩
