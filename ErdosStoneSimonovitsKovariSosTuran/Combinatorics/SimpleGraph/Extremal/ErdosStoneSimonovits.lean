@@ -23,7 +23,7 @@ variable {ε : ℝ} {r t t' : ℕ} (K : G.CompleteEquipartiteSubgraph r t')
 subgraph, in `r` parts each of size `t'`, adjacent to at least `t` vertices in each part of the
 complete equipartite subgraph.
 
-This is an auxiliary definition for the **Erdős-Stone theorem**. -/
+This is an auxiliary definition for the Erdős-Stone theorem. -/
 def filter (t : ℕ) : Finset (Fin n) :=
   { v ∈ K.vertsᶜ | ∀ p ∈ K.parts, ∃ s ∈ p.powersetCard t, ∀ w ∈ s, G.Adj v w }
 
@@ -47,7 +47,7 @@ lemma le_card_edgeFinset_between_verts :
 vertices in at least one part of the complete equipartite subgraph, it follows that `v` is
 adjacent to fewer than `#K.verts - (t' - t)` vertices in `K.verts`.
 
-This is an auxiliary definition for the **Erdős-Stone theorem**. -/
+This is an auxiliary lemma for the Erdős-Stone theorem. -/
 lemma degree_between_verts_lt_of_mem_sdiff
     {v : Fin n} (hv : v ∈ K.vertsᶜ \ filter K t) (ht'_pos : 0 < t') :
     (G.between K.verts K.vertsᶜ).degree v < #K.verts - t' + t := by
@@ -103,7 +103,7 @@ lemma card_edgeFinset_between_verts_le (hr_pos : 0 < r) (ht'_pos : 0 < t') :
 
 /-- `#ErdosStone.filter` is arbitrarily large with respect to `n`.
 
-This is an auxiliary definition for the **Erdős-Stone theorem**. -/
+This is an auxiliary theorem for the Erdős-Stone theorem. -/
 theorem mul_le_card_filter_mul (hr_pos : 0 < r) (ht'_pos : 0 < t')
     (hδ : G.minDegree ≥ (1 - 1 / r + ε) * n)
     {N : ℕ} (hN : (N + r * t') * (t' - t) ≤ n * (r * t' * ε - t)) :
@@ -129,7 +129,7 @@ theorem mul_le_card_filter_mul (hr_pos : 0 < r) (ht'_pos : 0 < t')
 /-- For `w ∈ ErdosStone.filter`, there exists a `r` subets of vertices of size `t < t'`
 adjacent to `w`.
 
-This is an auxiliary definition for the **Erdős-Stone theorem**. -/
+This is an auxiliary definition for the Erdős-Stone theorem. -/
 noncomputable def filter.pi :
     filter K t → K.parts.pi (·.powersetCard t) :=
   fun ⟨_, h⟩ ↦
@@ -144,7 +144,7 @@ theorem filter.pi.mem_val {p} (hp : p ∈ K.parts) (w : filter K t) :
 /-- If `#ErdosStone.filter` is sufficiently large, then there exist a `y` such that there
 are least `t` vertices in the fiber `ErdosStone.filter.pi A · = y`.
 
-This is an auxiliary definition for the **Erdős-Stone theorem**. -/
+This is an auxiliary theorem for the Erdős-Stone theorem. -/
 theorem filter.pi.exists_le_card_fiber (hr_pos : 0 < r) (ht'_pos : 0 < t')
     (ht_lt_t' : t < t') (hδ : G.minDegree ≥ (1 - 1 / r + ε) * n)
     (hN : (t'.choose t ^ r * t + r * t') * (t' - t) ≤ n * (r * t' * ε - t)) :
@@ -310,7 +310,7 @@ theorem eventually_completeEquipartiteGraph_isContained_of_minDegree
 /-- Repeatedly remove minimal degree vertices until `(G.induce s).minDegree` is at least `c * #s`
 and count the edges removed in the process.
 
-This is an auxiliary definition for the **Erdős-Stone theorem**. -/
+This is an auxiliary lemma for the Erdős-Stone theorem. -/
 lemma exists_induce_minDegree_ge_and_card_edgeFinset_ge {V : Type*} [Fintype V] [DecidableEq V]
     {c : ℝ} (hc_nonneg : 0 ≤ c) (G : SimpleGraph V) [DecidableRel G.Adj] :
     ∃ s : Finset V, ↑s ⊆ G.support ∧ c * #s ≤ (G.induce s).minDegree ∧
@@ -379,7 +379,7 @@ decreasing_by
 /-- Repeatedly remove minimal degree vertices until `(G.induce s).minDegree` is at least `c * #s`
 and `#s ^ 2 ≥ ε * card V ^ 2 - c * card V`, that is, `#s ≈ √ε * card V` when `c ≈ 0`.
 
-This is an auxiliary definition for the **Erdős-Stone theorem**. -/
+This is an auxiliary lemma for the Erdős-Stone theorem. -/
 lemma exists_induce_minDegree_ge_and_card_sq_ge {V : Type*} [Fintype V] [DecidableEq V]
     {c : ℝ} (hc_nonneg : 0 ≤ c) {ε : ℝ} {G : SimpleGraph V} [DecidableRel G.Adj]
     (h : #G.edgeFinset ≥ (c + ε) * card V ^ 2 / 2) :
@@ -506,7 +506,7 @@ namespace ErdosStoneSimonovits
 /-- If the `H` is `r`-colorable then `extremalNumber n H` is at most
 `(1 - 1 / r + o(1)) * n ^ 2 / 2`.
 
-This is an auxiliary definition for the **Erdős-Stone-Simonovits theorem**. -/
+This is an auxiliary lemma for the Erdős-Stone-Simonovits theorem. -/
 lemma eventually_extremalNumber_le_of_colorable
     {r : ℕ} (hc : H.Colorable (r + 1)) {ε : ℝ} (hε_pos : 0 < ε) :
     ∀ᶠ n in atTop, extremalNumber n H ≤ (1 - 1 / r + ε) * n ^ 2 / 2 := by
@@ -526,7 +526,7 @@ omit [Fintype W] in
 /-- If the `H` is not `r`-colorable and `r > 0`, then `extremalNumber n H` is greater than
 `(1 - 1 / r - o(1)) * n ^ 2 / 2`.
 
-This is an auxiliary definition for the **Erdős-Stone-Simonovits theorem**. -/
+This is an auxiliary lemma for the Erdős-Stone-Simonovits theorem. -/
 lemma eventually_le_extremalNumber_of_not_colorable
     {r : ℕ} (hr_pos : 0 < r) (nhc : ¬H.Colorable r) {ε : ℝ} (hε_pos : 0 < ε) :
     ∀ᶠ n in atTop, (1 - 1 / r - ε) * n ^ 2 / 2 ≤ extremalNumber n H := by
