@@ -183,7 +183,7 @@ theorem zarankiewicz_le (m n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
   have ht' : card (Fin s) ≤ card (Fin t) := by
     rwa [← Fintype.card_fin s, ← Fintype.card_fin t] at ht
   rw [← Fintype.card_fin m, ← Fintype.card_fin n, ← Fintype.card_fin s, ← Fintype.card_fin t,
-    ← KovariSosTuran.bound, zarankiewicz_card_le_iff_of_nonneg <|
+    ← KovariSosTuran.bound, zarankiewicz_card_le_iff_of_nonneg rfl rfl rfl rfl <|
     KovariSosTuran.bound_nonneg _ _ hs' (hs'.trans ht')]
   intro G _
   have : NeZero s := ⟨Nat.pos_iff_ne_zero.mp hs⟩
