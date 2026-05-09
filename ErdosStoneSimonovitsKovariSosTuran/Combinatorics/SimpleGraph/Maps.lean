@@ -6,7 +6,7 @@ namespace SimpleGraph
 
 /-- The isomorphism between `completeBipartiteGraph V₁ W₁` and
 `completeBipartiteGraph V₂ W₂` where `V₁ ≃ V₂` and `W₁ ≃ W₂`. -/
-def completeBipartiteGraph.congr {V₁ V₂ W₁ W₂ : Type*} (hV : V₁ ≃ V₂) (hW : W₁ ≃ W₂) :
+def completeBipartiteGraphCongr {V₁ V₂ W₁ W₂ : Type*} (hV : V₁ ≃ V₂) (hW : W₁ ≃ W₂) :
     completeBipartiteGraph V₁ W₁ ≃g completeBipartiteGraph V₂ W₂ where
   toFun := Sum.map hV hW
   invFun := Sum.map hV.symm hW.symm
