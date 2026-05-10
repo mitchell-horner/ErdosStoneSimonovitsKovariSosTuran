@@ -447,11 +447,11 @@ theorem eventually_completeEquipartiteGraph_isContained_of_card_edgeFinset
   -- `x ↦ ε' * x ^ 2 - c * x` is strictly monotonic on `[c / (2 * ε'), ∞)`
   have hMonoOn : MonotoneOn (fun x ↦ ε' * x ^ 2 - c * x) (Set.Ici (c / (2 * ε'))) := by
     refine monotoneOn_of_deriv_nonneg (convex_Ici _) ?_ ?_ (fun x hx ↦ ?_)
-    · apply Continuous.continuousOn
-      exact (continuous_const.mul (continuous_id'.pow 2)).sub (continuous_mul_left c)
-    · apply Differentiable.differentiableOn
-      exact ((differentiable_const ε').mul (differentiable_id'.pow 2)).sub
-        (differentiable_id'.const_mul c)
+    · exact Continuous.continuousOn <|
+        (continuous_const.mul (continuous_id'.pow 2)).sub (continuous_mul_left c)
+    · exact Differentiable.differentiableOn <|
+        ((differentiable_const ε').mul <| differentiable_id'.pow 2).sub
+          (differentiable_id'.const_mul c)
     · rw [deriv_sub ((differentiableAt_id'.pow 2).const_mul ε') (differentiableAt_id'.const_mul c),
         deriv_const_mul _ (differentiableAt_id'.pow 2), deriv_pow 2, Nat.cast_two, pow_one,
         ← mul_assoc ε' 2 x, mul_comm ε' 2, deriv_const_mul _ differentiableAt_id', deriv_id'',
