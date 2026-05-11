@@ -76,7 +76,7 @@ theorem lt_zarankiewicz_iff
 variable {R : Type*} [LinearOrderedSemiring R] [FloorSemiring R]
 
 @[inherit_doc zarankiewicz_le_iff]
-theorem zarankiewicz_card_le_iff_of_nonneg
+theorem zarankiewicz_le_iff_of_nonneg
     (hm : card V = m) (hn : card W = n) (hs : card α = s) (ht : card β = t) {x : R} (h : 0 ≤ x) :
     zarankiewicz m n s t ≤ x ↔
       ∀ ⦃G : SimpleGraph (V ⊕ W)⦄ [DecidableRel G.Adj], G ≤ completeBipartiteGraph V W →
@@ -85,7 +85,7 @@ theorem zarankiewicz_card_le_iff_of_nonneg
   exact zarankiewicz_le_iff hm hn hs ht ⌊x⌋₊
 
 @[inherit_doc lt_zarankiewicz_iff]
-theorem lt_zarankiewicz_card_iff_of_nonneg
+theorem lt_zarankiewicz_iff_of_nonneg
     (hm : card V = m) (hn : card W = n) (hs : card α = s) (ht : card β = t) {x : R} (h : 0 ≤ x) :
     x < zarankiewicz m n s t ↔
       ∃ G : SimpleGraph (V ⊕ W), ∃ _ : DecidableRel G.Adj, G ≤ completeBipartiteGraph V W ∧
