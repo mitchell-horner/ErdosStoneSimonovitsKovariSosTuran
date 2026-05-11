@@ -213,6 +213,6 @@ theorem extremalNumber_completeBipartiteGraph_le
   have : Nonempty β := card_pos_iff.mp <|  card_pos.trans_le hcard_le
   rw [← add_div, le_div_iff₀' zero_lt_two, ← Nat.cast_two, ← Nat.cast_mul]
   exact (symm_zarankiewicz_le n card_pos hcard_le).trans' <|
-    mod_cast two_mul_extremalNumber_le_zarankiewicz_symm
+    mod_cast two_mul_extremalNumber_le_zarankiewicz_symm rfl rfl
 
 end SimpleGraph
