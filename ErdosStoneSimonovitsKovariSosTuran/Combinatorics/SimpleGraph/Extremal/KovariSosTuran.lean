@@ -1,7 +1,5 @@
 import Mathlib
 import ErdosStoneSimonovitsKovariSosTuran.Analysis.SpecialFunctions.Pochhammer
-import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Bipartite
-import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Basic
 import ErdosStoneSimonovitsKovariSosTuran.Combinatorics.SimpleGraph.Extremal.Zarankiewicz
 
 open Finset Fintype
@@ -47,7 +45,7 @@ lemma card_filter_le [Nonempty β] (h : (completeBipartiteGraph α β).Free G) :
     rw [card_map, card_univ]
   simp_rw [card_filter, sum_product, ← card_filter, ← hcard_univ_map_inl, ← card_powersetCard,
     ← nsmul_eq_mul, ← sum_const, ← Nat.cast_pred card_pos, ← Nat.cast_sum, Nat.cast_le]
-  refine sum_le_sum (fun t ht_card ↦ ?_)
+  refine sum_le_sum fun t ht_card ↦ ?_
   contrapose! h
   obtain ⟨_, ht_card⟩ := mem_powersetCard.mp ht_card
   have ⟨t', ht'_sub, ht'_card⟩ := exists_subset_card_eq h
@@ -95,7 +93,6 @@ lemma le_card_filter [Nonempty W] [Nonempty α]
   exact descPochhammer_eval_div_factorial_le_sum_choose
     (by positivity) _ _ (by simp) (by simp) h_avg
 
-open Classical in
 /-- An upper bound on the number of edges in `completeBipartiteGraph α β`-free bipartite graphs.
 
 This is an auxiliary lemma for the **Kővári-Sós-Turán theorem**. -/
@@ -121,7 +118,7 @@ lemma card_edgeFinset_le_bound_of_completeBipartiteGraph_free [Nonempty α] [Non
           coe_univ, Set.image_univ, Set.mem_range, eq_comm, ← Sum.isLeft_iff, ← Sum.isRight_iff]
         exact h_le hadj
     have h_sum_degrees_eq_card_edges : ∑ w : W, ↑(G.degree (Sum.inr w)) = #G.edgeFinset := by
-      simp_rw [← isBipartiteWith_sum_degrees_eq_card_edges' h_isBipartiteWith,
+      classical simp_rw [← isBipartiteWith_sum_degrees_eq_card_edges' h_isBipartiteWith,
         Finset.sum_map, Function.Embedding.inr_apply]
     rcases lt_or_ge (∑ w : W, G.degree (.inr w) : ℝ) ((card α - 1) * (card W) : ℝ)
         with h_sum_lt | h_avg
@@ -157,7 +154,7 @@ lemma card_edgeFinset_le_bound_of_completeBipartiteGraph_free [Nonempty α] [Non
           mul_assoc (card α - 1 : ℝ), mul_assoc (card α - 1 : ℝ), mul_assoc (card W : ℝ),
           ← Real.rpow_add (by positivity), add_neg_cancel, Real.rpow_zero, mul_one] at h
       -- double-counting `(t, v) ↦ t ⊆ G.neighborSet v`
-      trans (#(filter G (card α)) : ℝ)
+      classical trans (#(filter G (card α)) : ℝ)
       -- counting `t`
       · trans (card W) * ((descPochhammer ℝ (card α)).eval
           ((∑ w : W, G.degree (.inr w) : ℝ) / card W) / (card α).factorial)
@@ -177,8 +174,8 @@ end KovariSosTuran
 
 This is the **Kővári-Sós-Turán theorem**. -/
 theorem zarankiewicz_le (m n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
-    zarankiewicz m n s t
-      ≤ ((t - 1) ^ (s⁻¹ : ℝ) * m * n ^ (1 - (s⁻¹ : ℝ)) + (s - 1) * n : ℝ) := by
+    zarankiewicz m n s t ≤
+      ((t - 1) ^ (s⁻¹ : ℝ) * m * n ^ (1 - (s⁻¹ : ℝ)) + (s - 1) * n : ℝ) := by
   have : NeZero s := ⟨Nat.pos_iff_ne_zero.mp hs⟩
   have : NeZero t := ⟨Nat.pos_iff_ne_zero.mp <| hs.trans ht⟩
   rw [← KovariSosTuran.bound, zarankiewicz_le_iff_of_nonneg
@@ -193,12 +190,12 @@ theorem zarankiewicz_le (m n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
 
 This is a corollary of the **Kővári-Sós-Turán theorem**. -/
 theorem symm_zarankiewicz_le (n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t) :
-    zarankiewicz n n s t
-      ≤ ((t - 1) ^ (s : ℝ)⁻¹ * n ^ (2 - (s : ℝ)⁻¹) + (s - 1) * n : ℝ) := by
+    zarankiewicz n n s t ≤
+      ((t - 1) ^ (s : ℝ)⁻¹ * n ^ (2 - (s : ℝ)⁻¹) + (s - 1) * n : ℝ) := by
   have h_one_add_one_sub_inv_card_ne_zero : 1 + (1 - (s : ℝ)⁻¹) ≠ 0 := by
-      rw [← add_sub_assoc, ← show (2 : ℝ) = (1 : ℝ) + (1 : ℝ) by norm_num]
-      exact sub_ne_zero_of_ne <| ne_of_gt <| s.cast_inv_le_one.trans_lt one_lt_two
-  rw [show (2 : ℝ) = (1 : ℝ) + (1 : ℝ) by norm_num, add_sub_assoc,
+    rw [← add_sub_assoc, one_add_one_eq_two]
+    exact sub_ne_zero_of_ne <| ne_of_gt <| s.cast_inv_le_one.trans_lt one_lt_two
+  rw [← one_add_one_eq_two, add_sub_assoc,
     Real.rpow_one_add' (by positivity) h_one_add_one_sub_inv_card_ne_zero, ← mul_assoc]
   exact zarankiewicz_le n n hs ht
 
@@ -207,8 +204,8 @@ theorem symm_zarankiewicz_le (n : ℕ) {s t : ℕ} (hs : 1 ≤ s) (ht : s ≤ t)
 This is a corollary of the **Kővári-Sós-Turán theorem**. -/
 theorem extremalNumber_completeBipartiteGraph_le
     (n : ℕ) [Nonempty α] (hcard_le : card α ≤ card β) :
-    (extremalNumber n (completeBipartiteGraph α β) : ℝ)
-      ≤ (card β - 1) ^ (card α : ℝ)⁻¹ * n ^ (2 - (card α : ℝ)⁻¹) / 2 + (card α - 1) * n / 2 := by
+    (extremalNumber n (completeBipartiteGraph α β) : ℝ) ≤
+      (card β - 1) ^ (card α : ℝ)⁻¹ * n ^ (2 - (card α : ℝ)⁻¹) / 2 + (card α - 1) * n / 2 := by
   have : Nonempty β := card_pos_iff.mp <|  card_pos.trans_le hcard_le
   rw [← add_div, le_div_iff₀' zero_lt_two, ← Nat.cast_two, ← Nat.cast_mul]
   exact (symm_zarankiewicz_le n card_pos hcard_le).trans' <|
