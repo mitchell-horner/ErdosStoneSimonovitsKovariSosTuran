@@ -26,6 +26,11 @@ theorem IsBipartiteWith.symm (h : G.IsBipartiteWith s t) : G.IsBipartiteWith t s
 theorem isBipartiteWith_comm : G.IsBipartiteWith s t ↔ G.IsBipartiteWith t s :=
   ⟨IsBipartiteWith.symm, IsBipartiteWith.symm⟩
 
+/-- A subgraph of a graph that is bipartite with parts `s` and `t` is bipartite with the same
+parts. -/
+theorem IsBipartiteWith.anti {G' : SimpleGraph V} (h : G.IsBipartiteWith s t) (hle : G' ≤ G) :
+    G'.IsBipartiteWith s t := ⟨h.disjoint, fun _ _ hadj ↦ h.mem_of_adj (hle hadj)⟩
+
 /-- If `G.IsBipartiteWith s t` and `v ∈ s`, then if `v` is adjacent to `w` in `G` then `w ∈ t`. -/
 theorem IsBipartiteWith.mem_of_mem_adj
     (h : G.IsBipartiteWith s t) (hv : v ∈ s) (hadj : G.Adj v w) : w ∈ t := by
@@ -192,6 +197,13 @@ See `SimpleGraph.sum_degrees_eq_twice_card_edges` for the general version, and
 `SimpleGraph.isBipartiteWith_sum_degrees_eq_card_edges` for the version from the "left". -/
 theorem isBipartiteWith_sum_degrees_eq_card_edges' (h : G.IsBipartiteWith s t) :
     ∑ v ∈ t, G.degree v = #G.edgeFinset := isBipartiteWith_sum_degrees_eq_card_edges h.symm
+
+protected theorem IsBipartiteWith.completeBipartiteGraph (V W : Type*) :
+    (completeBipartiteGraph V W).IsBipartiteWith (.range .inl) (.range .inr) := by
+  refine ⟨Set.disjoint_iff_forall_ne.mpr ?_, fun v w hadj ↦ ?_⟩
+  · rintro _ ⟨v, rfl⟩ _ ⟨w, rfl⟩
+    exact Sum.inl_ne_inr
+  · rcases v with v | v <;> rcases w with w | w <;> simp_all
 
 end IsBipartiteWith
 
@@ -422,5 +434,34 @@ theorem isBipartiteWith_bipartiteDoubleCover :
   mem_of_adj := by simp
 
 end BipartiteDoubleCover
+
+section completeBipartiteGraph
+
+variable {V W : Type*}
+
+/-- A complete bipartite graph is empty iff one of its parts is empty. -/
+theorem completeBipartiteGraph_eq_bot_iff :
+    completeBipartiteGraph V W = ⊥ ↔ IsEmpty V ∨ IsEmpty W := by
+  simp [SimpleGraph.ext_iff, funext_iff, Sum.forall, isEmpty_iff,
+    (by tauto : ((V → W → False) ∧ (W → V → False)) ↔ ((V → False) ∨ (W → False)))]
+
+/-- A complete bipartite graph whose left part is empty is empty. -/
+theorem completeBipartiteGraph_eq_bot_of_isEmpty_left [IsEmpty V] :
+    completeBipartiteGraph V W = ⊥ := completeBipartiteGraph_eq_bot_iff.mpr (.inl ‹_›)
+
+/-- A complete bipartite graph whose right part is empty is empty. -/
+theorem completeBipartiteGraph_eq_bot_of_isEmpty_right [IsEmpty W] :
+    completeBipartiteGraph V W = ⊥ := completeBipartiteGraph_eq_bot_iff.mpr (.inr ‹_›)
+
+/-- A complete bipartite graph is complete iff both parts have at most one vertex. -/
+theorem completeBipartiteGraph_eq_top_iff :
+    completeBipartiteGraph V W = ⊤ ↔ Subsingleton V ∧ Subsingleton W := by
+  simp [SimpleGraph.ext_iff, funext_iff, Sum.forall, subsingleton_iff]
+
+/-- A complete bipartite graph whose parts have at most one vertex each is complete. -/
+theorem completeBipartiteGraph_eq_top_of_subsingleton [Subsingleton V] [Subsingleton W] :
+  completeBipartiteGraph V W = ⊤ := completeBipartiteGraph_eq_top_iff.mpr ⟨‹_›, ‹_›⟩
+
+end completeBipartiteGraph
 
 end SimpleGraph
